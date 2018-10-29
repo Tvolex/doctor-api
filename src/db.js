@@ -8,7 +8,7 @@ let client = null;
 
 async function init () {
     try {
-        client = await MongoClient.connect(DB_URI);
+        client = await MongoClient.connect(DB_URI, { useNewUrlParser: true });
         isConnected = !!client;
     } catch (err) {
         console.log(err);
