@@ -2,6 +2,7 @@ const express = require ('express');
 const bodyParser = require ('body-parser');
 const session = require ('express-session');
 const cookieParser = require ('cookie-parser');
+const cors = require('cors');
 const path = require ('path');
 const app = express();
 const router = require('./router');
@@ -16,7 +17,8 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
-
+app.use(cors);
+app.options('*', cors());
 
 app.get(['/'], (req, res) => {
     res.send({
