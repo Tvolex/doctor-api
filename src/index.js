@@ -17,8 +17,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }));
-app.use(cors);
-app.options('*', cors());
+app.use(cors());
 
 app.get(['/'], (req, res) => {
     res.send({
