@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const Schema = require('./Joi.schema');
+const ObjectID = require('mongodb').ObjectID;
 const _ = require('lodash');
 const { getCollections } = require('../../db');
 const Collections = getCollections();
@@ -7,7 +8,7 @@ const Collections = getCollections();
 const defaultUserProject = {
     _id: 1,
     email: 1,
-    password: 0,
+    password: 1,
     username: 1,
     birthyear: 1,
     birthmonth: 1,
@@ -72,11 +73,29 @@ module.exports = {
             pipeline.push(filterBuilder(filter));
         }
 
-        pipeline.push({
-            $project: defaultUserProject,
-        });
-
         return Collections.users.aggregate(pipeline).toArray();
+    },
+
+    async findByCredential({email, password}) {
+        return Collections.users.find({email, password}).next();
+    },
+
+    async findOne(match) {
+        return Collections.users.findOne(match);
+    },
+
+    async getById(_id) {
+        return Collections.users.findOne({ _id: ObjectID(_id) });
+    },
+
+    async updateUserSession({_id, session}){
+        return Collections.users.findOneAndUpdate({
+            _id: ObjectID(_id)
+        }, {
+            $set: { session }
+        }, {
+            projection: defaultUserProject
+        });
     },
 
     async create(req) {
