@@ -12,7 +12,10 @@ async function init () {
         isConnected = !!client;
     } catch (err) {
         console.log(err);
+        throw err;
     }
+
+    console.log(`DB connected successfully`);
 
     return client;
 };
