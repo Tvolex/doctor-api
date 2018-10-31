@@ -33,12 +33,19 @@ Router.post('/login', async (req, res, next) => {
                 })
         }
 
+        console.log(`Login session: ${req.sessionID}`);
+
         const session = {
             uId: user._id,
-            id: Token.generate(16),
+      //      id: Token.generate(16),
+            id: req.sessionID,
         };
 
-        req.session = session;
+        req.session.uId = user._id;
+        req.session.id = req.sessionID;
+
+
+        // req.session = session;
 
         await UserModel.updateUserSession({ _id: user._id, session: session.id });
 
@@ -64,6 +71,8 @@ Router.get('/auth', async (req, res, next) => {
             id
         } = {},
     } = req;
+
+    console.log(`Auth session: ${req.sessionID}`);
 
     if (_.isEmpty(req.session) || !id || !uId) {
         return res.status(401)

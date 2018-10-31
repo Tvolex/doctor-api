@@ -4,6 +4,7 @@ const cookieParser = require ('cookie-parser');
 const cors = require('cors');
 const path = require ('path');
 const app = express();
+const session = require ('express-session');
 const router = require('./router');
 const config = require('../config');
 const { init, initCollections } = require('./db');
@@ -11,14 +12,18 @@ const { init, initCollections } = require('./db');
 
 app.use(bodyParser.json());
 app.use(cookieParser('Kvb6swFdB&m66sk4aSB9pSKm'));
-
+app.use(bodyParser.json());
+app.use(session({
+    secret: 'Kvb6swFdB&m66sk4aSB9pSKm',
+    resave: true,
+    saveUninitialized: true
+}));
 app.use(cors());
 
+app.all('/*', (req, res, next) => {
+    console.log(req.sessionID);
 
-app.get(['/'], (req, res) => {
-    res.send({
-        status: "ok",
-    })
+    next();
 });
 
 app.use(router);

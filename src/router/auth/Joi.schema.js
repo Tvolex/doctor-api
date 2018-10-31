@@ -17,7 +17,10 @@ module.exports = {
         passportSeries: Joi.string().max(4).required(),
         passportNumber: Joi.number().min(5).max(7).required(),
     }),
-
+    get: Joi.object().keys({
+        email: Joi.string().email({ minDomainAtoms: 2 }).required(),
+        password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
+    }),
     get: Joi.object().keys({
         filter: Joi.object().keys({
             birthyear: Joi.number().integer().min(1900).max(currentDate.getFullYear()).required(),
@@ -28,7 +31,6 @@ module.exports = {
             house: Joi.number().required(),
             apartment: Joi.number(),
         }),
-
     }),
 
 };
