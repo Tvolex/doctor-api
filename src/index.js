@@ -1,6 +1,5 @@
 const express = require ('express');
 const bodyParser = require ('body-parser');
-const session = require ('express-session');
 const cookieParser = require ('cookie-parser');
 const cors = require('cors');
 const path = require ('path');
@@ -10,14 +9,11 @@ const config = require('../config');
 const { init, initCollections } = require('./db');
 
 
-app.use(cookieParser());
 app.use(bodyParser.json());
-app.use(session({
-    secret: ',Kvb6s<wh(yB#&m66sk4@a+SB9pSKm-',
-    resave: true,
-    saveUninitialized: true
-}));
+app.use(cookieParser('Kvb6swFdB&m66sk4aSB9pSKm'));
+
 app.use(cors());
+
 
 app.get(['/'], (req, res) => {
     res.send({

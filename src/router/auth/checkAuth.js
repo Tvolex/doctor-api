@@ -1,5 +1,12 @@
 const CheckAuth = (req, res, next) => {
-    if (req.session && req.session.userId && req.session.id) {
+    const {
+        session: {
+            uId,
+            id
+        } = {},
+    } = req;
+
+    if (!_.isEmpty(req.session) && uId && id) {
         return next();
     } else {
         return res.status(401)
