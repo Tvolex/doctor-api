@@ -20,13 +20,13 @@ app.use(session({
 }));
 app.use(cors());
 
-app.all('/*', (req, res, next) => {
+app.all((req, res, next) => {
     console.log(req.sessionID);
 
     next();
 });
 
-app.use(router);
+app.use('/api', router);
 
 // Error handler
 process.on('unhandledRejection', (reason, p) => {
