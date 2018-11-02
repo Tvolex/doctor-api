@@ -109,11 +109,13 @@ Router.get('/logout', async (req, res, next) => {
         } = {},
     } = req;
 
-    if (_.isEmpty(req.session) && id) {
-        console.log(`User ${req.session.uId} logged out`);
+    console.log(`Logout session: ${req.sessionID}`);
 
-        req.session.destroy();
+    if (!_.isEmpty(req.session) && uId) {
+        console.log(`User ${req.session.uId} logged out`);
     }
+
+    req.session.destroy();
 
     return res.status(200)
         .send({
