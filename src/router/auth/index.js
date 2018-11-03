@@ -64,7 +64,7 @@ Router.post('/login', async (req, res, next) => {
         .send(user);
 });
 
-Router.get('/auth', async (req, res, next) => {
+Router.get('/check', async (req, res, next) => {
     const {
         session: {
             uId,

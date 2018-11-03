@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const CheckAuth = (req, res, next) => {
     const {
         session: {
