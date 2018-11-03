@@ -21,7 +21,7 @@ Router.post('/login', async (req, res, next) => {
             return res.status(400)
                 .send({
                     type: 'error',
-                    message: "Incorrect email"
+                    message: "Неправильний E-mail"
                 })
         }
 
@@ -29,7 +29,7 @@ Router.post('/login', async (req, res, next) => {
             return res.status(400)
                 .send({
                     type: 'error',
-                    message: "Incorrect password"
+                    message: "Неправильний пароль"
                 })
         }
 
@@ -78,7 +78,7 @@ Router.get('/check', async (req, res, next) => {
         return res.status(401)
             .send({
                 type: 'error',
-                message: "Not authorized"
+                message: "Не авторизовано!"
             })
     }
 
