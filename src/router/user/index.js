@@ -7,24 +7,6 @@ const getRandom = () => {
     return Math.floor(Math.random() * (99 - 1)) + 1;
 }
 
-Router.get('/:id', async (req, res, next) => {
-    const user = await UserModel.getById(req.params.id);
-
-    res.send(user);
-});
-
-Router.get('/', async (req, res, next) => {
-    const users = await UserModel.get(req.query);
-
-    res.send(users);
-});
-
-Router.post('/', CheckAuth, async (req, res, next) => {
-    const user = await UserModel.create(req);
-
-    res.send(user);
-});
-
 Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
     // const user = await UserModel.get(req);
     console.log('Get Statistics by user: ' + req.session.uId);
@@ -47,6 +29,24 @@ Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
                 ]
             },
         });
+});
+
+Router.get('/:id', async (req, res, next) => {
+    const user = await UserModel.getById(req.params.id);
+
+    res.send(user);
+});
+
+Router.get('/', async (req, res, next) => {
+    const users = await UserModel.get(req.query);
+
+    res.send(users);
+});
+
+Router.post('/', CheckAuth, async (req, res, next) => {
+    const user = await UserModel.create(req);
+
+    res.send(user);
 });
 
 

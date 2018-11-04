@@ -3,7 +3,8 @@ const _ = require('lodash');
 const express = require('express');
 const ObjectID = require('mongodb').ObjectID;
 const Router = express.Router();
-const UserModel = require('./model');
+const AuthModel = require('./model');
+const UserModel = require('../user/model');
 
 Router.post('/login', async (req, res, next) => {
     const {
@@ -47,7 +48,7 @@ Router.post('/login', async (req, res, next) => {
 
         // req.session = session;
 
-        await UserModel.updateUserSession({ _id: user._id, session: session.id });
+        await AuthModel.updateUserSession({ _id: user._id, session: session.id });
 
         console.log(`User ${user._id} logged in`);
 

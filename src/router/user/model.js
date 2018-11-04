@@ -1,23 +1,24 @@
 const Joi = require('joi');
 const Schema = require('./Joi.schema');
 const _ = require('lodash');
-const ObjectID = require('mongodb').ObjectID;
+const ObjectId = require('mongodb').ObjectId;
 const { getCollections } = require('../../db');
 const Collections = getCollections();
 
 const defaultUserProject = {
     email: 1,
-    password: 0,
     name: 1,
-    birthyear: 1,
-    birthmonth: 1,
-    birthday: 1,
+    surname: 1,
+    patronymic: 1,
+    birthdate: 1,
     city: 1,
     street: 1,
     house: 1,
     apartment: 1,
     passportSeries: 1,
     passportNumber: 1,
+    type: 1,
+    specialization: 1,
 };
 
 const filterBuilder = (filters) => {
@@ -75,18 +76,17 @@ module.exports = {
         }
 
         pipeline.push({
-            $project: {
-                name: 1,
-                email: 1,
-                type: 1,
-                specialization: 1,
-            },
+            $project: defaultUserProject,
         });
 
         return Collections.users.aggregate(pipeline).toArray();
     },
     async getById(id) {
-        return Collections.users.find({_id: ObjectID(id)}).next();
+        return Collections.users.find({_id: ObjectId(id)}).next();
+    },
+
+    async findOne(match) {
+        return Collections.users.findOne(match);
     },
 
     async create(req) {
