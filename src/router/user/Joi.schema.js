@@ -51,8 +51,8 @@ module.exports = {
             street:  Joi.string(),
             house: Joi.number(),
             apartment: Joi.number(),
-            type: Joi.array(),
-            specialization: Joi.array(),
+            type: Joi.array().items(Joi.string()),
+            specialization: Joi.array().items(Joi.string()),
         }),
     }),
 };

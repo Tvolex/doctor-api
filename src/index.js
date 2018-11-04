@@ -10,7 +10,8 @@ const config = require('../config');
 const { init, initCollections } = require('./db');
 
 
-app.use(bodyParser.json());
+app.use(bodyParser.json( { strict: false } ));
+app.use(bodyParser.urlencoded( { extended: false } ));
 app.use(cookieParser('Kvb6swFdB&m66sk4aSB9pSKm'));
 app.use(session({
     secret: 'Kvb6swFdB&m66sk4aSB9pSKm',
@@ -28,9 +29,14 @@ app.all((req, res, next) => {
 app.use('/api', router);
 
 // Error handler
-process.on('unhandledRejection', (reason, p) => {
-    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
-    // application specific logging, throwing an error, or other logic here
+process.on('unhandledRejection', (reason) => {
+    console.log(reason);
+    process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+    console.log(error);
+    process.exit(1);
 });
 
 app.use((req, res, next) => {

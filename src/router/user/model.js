@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const Schema = require('./Joi.schema');
 const _ = require('lodash');
+const ObjectID = require('mongodb').ObjectID;
 const { getCollections } = require('../../db');
 const Collections = getCollections();
 
@@ -52,10 +53,8 @@ const filterBuilder = (filters) => {
 };
 
 module.exports = {
-    async get(req) {
-        const { query, body } = req;
+    async get(query) {
 
-        query.filter = JSON.parse(query.filter);
         console.log('Get users');
         try {
             params = await Joi.validate(query, Schema.get);
@@ -85,6 +84,9 @@ module.exports = {
         });
 
         return Collections.users.aggregate(pipeline).toArray();
+    },
+    async getById(id) {
+        return Collections.users.find({_id: ObjectID(id)}).next();
     },
 
     async create(req) {

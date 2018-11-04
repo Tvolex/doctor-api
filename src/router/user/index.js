@@ -7,8 +7,14 @@ const getRandom = () => {
     return Math.floor(Math.random() * (99 - 1)) + 1;
 }
 
+Router.get('/:id', async (req, res, next) => {
+    const user = await UserModel.getById(req.params.id);
+
+    res.send(user);
+});
+
 Router.get('/', async (req, res, next) => {
-    const users = await UserModel.get(req);
+    const users = await UserModel.get(req.query);
 
     res.send(users);
 });
