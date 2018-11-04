@@ -12,6 +12,7 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "joi": "^14.0.1",
+    "keygenerator": "^1.0.4",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.8",
     "mongoose": "^5.3.9",

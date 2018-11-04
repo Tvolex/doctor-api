@@ -1,8 +1,9 @@
 const Joi = require('joi');
-const Schema = require('./Joi.schema');
 const _ = require('lodash');
 const ObjectId = require('mongodb').ObjectId;
+const keygen = require("keygenerator");
 const { getCollections } = require('../../db');
+const Schema = require('./Joi.schema');
 const Collections = getCollections();
 
 const defaultUserProject = {
@@ -85,23 +86,36 @@ module.exports = {
         return Collections.users.find({_id: ObjectId(id)}).next();
     },
 
+    async getUserByPersonalKey(personalKey) {
+        return Collections.users.find({personalKey}).next();
+    },
+
     async findOne(match) {
         return Collections.users.findOne(match);
     },
 
-    async create(req) {
-        const { body } = req;
-
-        let params;
-
+    async createNewPatient(newPatient) {
+        let patient;
         try {
-            params = await Joi.validate(body, Schema.create);
+            patient = await Joi.validate(newPatient, Schema.createNewPatient);
         } catch (err) {
             err.status = 400;
             console.log(err);
             throw err;
         }
 
-        return Collections.users.insertOne(params);
+        patient._id = new ObjectId();
+        patient.personalKey = keygen._({forceUppercase: true});
+        patient.type = 'patient';
+
+        try {
+            await Collections.users.insertOne(patient);
+        } catch (err) {
+            err.status = 400;
+            console.log(err);
+            throw err;
+        }
+
+        return this.getById(patient._id);
     },
 };

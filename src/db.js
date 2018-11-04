@@ -27,6 +27,7 @@ const checkIsConnected = () => {
 const initCollections = async () => {
     if (isConnected) {
         Collections.users = client.db('dev').collection('users');
+        Collections.events = client.db('dev').collection('events');
 
         return Collections;
     }
