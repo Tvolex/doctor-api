@@ -12,7 +12,6 @@ const { init, initCollections } = require('./db');
 
 app.use(bodyParser.json());
 app.use(cookieParser('Kvb6swFdB&m66sk4aSB9pSKm'));
-app.use(bodyParser.json());
 app.use(session({
     secret: 'Kvb6swFdB&m66sk4aSB9pSKm',
     resave: true,

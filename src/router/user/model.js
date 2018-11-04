@@ -5,10 +5,9 @@ const { getCollections } = require('../../db');
 const Collections = getCollections();
 
 const defaultUserProject = {
-    _id: 1,
     email: 1,
     password: 0,
-    username: 1,
+    name: 1,
     birthyear: 1,
     birthmonth: 1,
     birthday: 1,
@@ -26,25 +25,25 @@ const filterBuilder = (filters) => {
     for (let filter in filters) {
         switch (filter) {
             case "city":
-                $and.push({city: filter.city});
+                $and.push({city: { $in: filters.city} });
                 break;
             case "street":
-                $and.push({street: filter.street});
+                $and.push({street: { $in: filters.street} });
                 break;
             case "house":
-                $and.push({house: filter.house});
+                $and.push({house: { $in: filters.house} });
                 break;
             case "apartment":
-                $and.push({apartment: filter.apartment});
+                $and.push({apartment: { $in: filters.apartment} });
                 break;
-            case "birthyear":
-                $and.push({birthyear: filter.birthyear});
+            case "birthdate":
+                $and.push({birthdate: { $in: filters.birthdate} });
                 break;
-            case "birthmonth":
-                $and.push({birthmonth: filter.birthmonth});
+            case "type":
+                $and.push({type: { $in: filters.type} });
                 break;
-            case "birthday":
-                $and.push({birthday: filter.birthday});
+            case "specialization":
+                $and.push({specialization: { $in: filters.specialization} });
                 break;
         }
     }
@@ -56,8 +55,8 @@ module.exports = {
     async get(req) {
         const { query, body } = req;
 
-        let params;
-
+        query.filter = JSON.parse(query.filter);
+        console.log('Get users');
         try {
             params = await Joi.validate(query, Schema.get);
         } catch (err) {
@@ -69,11 +68,20 @@ module.exports = {
         const pipeline = [];
 
         if (!_.isEmpty(params.filter)) {
-            pipeline.push(filterBuilder(filter));
+            pipeline.push({
+                $match: {
+                    $and: filterBuilder(params.filter),
+                }
+            });
         }
 
         pipeline.push({
-            $project: defaultUserProject,
+            $project: {
+                name: 1,
+                email: 1,
+                type: 1,
+                specialization: 1,
+            },
         });
 
         return Collections.users.aggregate(pipeline).toArray();

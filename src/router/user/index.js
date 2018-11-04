@@ -7,13 +7,13 @@ const getRandom = () => {
     return Math.floor(Math.random() * (99 - 1)) + 1;
 }
 
-Router.get('/user', async (req, res, next) => {
+Router.get('/', async (req, res, next) => {
     const users = await UserModel.get(req);
 
     res.send(users);
 });
 
-Router.post('/user', CheckAuth, async (req, res, next) => {
+Router.post('/', CheckAuth, async (req, res, next) => {
     const user = await UserModel.create(req);
 
     res.send(user);
