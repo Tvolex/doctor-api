@@ -2,7 +2,8 @@
   "name": "doctor-api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "nodemon %NODE_DEBUG_OPTION% src/index.js",
+    "dev": "nodemon $NODE_DEBUG_OPTION src/index.js",
+    "debug": "node $NODE_DEBUG_OPTION src/index.js",
     "start": "node src/index.js"
   },
   "dependencies": {
@@ -12,8 +13,10 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "joi": "^14.0.1",
+    "joi-objectid": "^2.0.0",
     "keygenerator": "^1.0.4",
     "lodash": "^4.17.11",
+    "moment": "^2.22.2",
     "mongodb": "^3.1.8",
     "mongoose": "^5.3.9",
     "nodemon": "^1.18.5",

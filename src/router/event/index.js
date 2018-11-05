@@ -6,13 +6,24 @@ const EventModel = require('./model');
 Router.post('/', async (req, res, next) => {
     const { body } = req;
 
-    let user;
-
     try {
-        if (body.parsonalKey) {
-            user = await EventModel.createByPersonalKey(body);
+        if (body.personalKey) {
+            const dataOfInserting = await EventModel.createByPersonalKey(body);
+
+            if (dataOfInserting.insertedId && dataOfInserting.result.ok) {
+                return res
+                    .status(200)
+                    .send({ type: 'info', message: `Ви були успішно зареєстровані по вашому персональному ключу`});
+            }
+
         } else if (body.newPatient) {
             user = await EventModel.create(body);
+
+            if (user) {
+                return res
+                    .status(200)
+                    .send({ type: 'info', message: `Ви були зареєстровані, при наступному запису використовуйте цей ключ: ${user.personalKey}`});
+            }
         } else {
             return res.status(400).send({
                 type: 'warning',
@@ -21,23 +32,22 @@ Router.post('/', async (req, res, next) => {
         }
     } catch (err) {
         console.log(err);
-        return res.status(400)
+
+        if (err.isCustom) {
+            return res.status(err.status).send({type: 'info', message: err.message});
+        }
+
+        return res.status(500)
             .send({
                 type: 'error',
                 message: "Error in EventModel"
             })
     }
 
-    console.log('Create event by user: ' + user._id);
-
-    if (user) {
-        return res
-            .status(200)
-            .send({ type: 'info', message: `Ви були зареєстровані, при наступному запису використовуйте цей ключ: ${user.personalKey}`});
-    }
-    res
+    return res
         .status(200)
         .send({ type: 'error', message: 'Something went wrong'});
+
 });
 
 

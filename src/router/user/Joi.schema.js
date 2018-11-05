@@ -1,45 +1,57 @@
 const Joi = require('joi');
+Joi.ObjectId = require('joi-objectid')(Joi);
 
 const currentDate = new Date();
 
-const email = Joi.string().email({ minDomainAtoms: 2 }).required();
-const password = Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required();
-const name = Joi.string().alphanum().min(3).max(30).required();
-const surname = Joi.string().alphanum().min(3).max(30).required();
-const patronymic = Joi.string().alphanum().min(3).max(30).required();
-const birthdate = Joi.date().required();
-const city = Joi.string().required();
-const street = Joi.string().required();
-const house = Joi.number().required();
+const _id = Joi.ObjectId();
+const email = Joi.string().email({ minDomainAtoms: 2 });
+const password = Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/);
+const name = Joi.string().alphanum().min(3).max(30);
+const surname = Joi.string().alphanum().min(3).max(30);
+const patronymic = Joi.string().alphanum().min(3).max(30);
+const birthdate = Joi.date();
+const city = Joi.string();
+const street = Joi.string();
+const house = Joi.number();
 const apartment = Joi.number();
-const passportSeries = Joi.string().max(3).required();
-const passportNumber = Joi.number().required();
-const personalKey = Joi.string().required();
+const passportSeries = Joi.string().max(3);
+const passportNumber = Joi.number();
+const type = Joi.string().valid(['doctor', 'patient']);
+const personalKey = Joi.string().min(32).max(32);
 
 module.exports = {
     createNewPatient: Joi.object().keys({
-        email,
-        name,
-        surname,
-        patronymic,
-        birthdate,
-        city,
-        street,
-        house,
-        apartment,
-        passportSeries,
-        passportNumber,
+        email: email.required(),
+        name: name.required(),
+        surname: surname.required(),
+        patronymic: patronymic.required(),
+        birthdate: birthdate.required(),
+        city: city.required(),
+        street: street.required(),
+        house: house.required(),
+        apartment: apartment.required(),
+        passportSeries: passportSeries.required(),
+        passportNumber: passportNumber.required(),
     }),
 
     get: Joi.object().keys({
         filter: Joi.object().keys({
-            birthdate: Joi.date(),
-            city:   Joi.string(),
-            street:  Joi.string(),
-            house: Joi.number(),
-            apartment: Joi.number(),
-            type: Joi.array().items(Joi.string()),
+            birthdate,
+            city,
+            street,
+            house,
+            apartment,
+            type: Joi.array().items(type),
             specialization: Joi.array().items(Joi.string()),
         }),
+    }),
+
+    has: Joi.object().keys({
+        _id,
+        email,
+        name,
+        surname,
+        patronymic,
+        personalKey,
     }),
 };

@@ -11,6 +11,7 @@ const defaultUserProject = {
     name: 1,
     surname: 1,
     patronymic: 1,
+    fullName: 1,
     birthdate: 1,
     city: 1,
     street: 1,
@@ -56,7 +57,6 @@ const filterBuilder = (filters) => {
 
 module.exports = {
     async get(query) {
-
         console.log('Get users');
         try {
             params = await Joi.validate(query, Schema.get);
@@ -105,6 +105,7 @@ module.exports = {
         }
 
         patient._id = new ObjectId();
+        patient.fullName = `${patient.surname} ${patient.name} ${patient.patronymic}`;
         patient.personalKey = keygen._({forceUppercase: true});
         patient.type = 'patient';
 
@@ -118,4 +119,8 @@ module.exports = {
 
         return this.getById(patient._id);
     },
+
+    has(match) {
+        return Collections.users.find(match).hasNext();
+    }
 };
