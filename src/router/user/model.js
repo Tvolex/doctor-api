@@ -56,10 +56,11 @@ const filterBuilder = (filters) => {
 };
 
 module.exports = {
-    async get(query) {
+    async get(req, option) {
         console.log('Get users');
+        let params;
         try {
-            params = await Joi.validate(query, Schema.get);
+            params = await Joi.validate(req.query, Schema.get);
         } catch (err) {
             err.status = 400;
             console.log(err);
@@ -76,6 +77,40 @@ module.exports = {
             });
         }
 
+        if (option && option.filterByEvents) {
+            pipeline.push(...[
+                {
+                    $match: {
+                        type:  'patient',
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'events',
+                        let: {
+                            patient: '$_id',
+                            doctor: ObjectId(req.session.uId),
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ['$doctor', '$$doctor'] },
+                                            { $eq: ['$patient', '$$patient'] },
+                                        ],
+
+                                    }
+                                }
+                            },
+                        ],
+                        as: 'events',
+                    }
+                },
+            ]);
+        }
+
+
         pipeline.push({
             $project: defaultUserProject,
         });
@@ -84,6 +119,10 @@ module.exports = {
     },
     async getById(id) {
         return Collections.users.find({_id: ObjectId(id)}).next();
+    },
+
+    async getPatients({ type,}) {
+
     },
 
     async getUserByPersonalKey(personalKey) {

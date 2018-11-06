@@ -31,17 +31,27 @@ Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
         });
 });
 
-Router.get('/:id', async (req, res, next) => {
-    const user = await UserModel.getById(req.params.id);
+Router.get('/patients', CheckAuth, async (req, res, next) => {
+    UserModel.get(req, {filterByEvents: true}).then((users) => {
+        res.send(users);
+    }).catch((err) => {
+        res.send({type: 'error', message: err.message});
+    });
+});
 
-    res.send(user);
+Router.get('/:id', async (req, res, next) => {
+    UserModel.getById(req.query).then((users) => {
+        res.send(users);
+    }).catch((err) => {
+        res.send({type: 'error', message: err.message});
+    });
 });
 
 Router.get('/', async (req, res, next) => {
-    UserModel.get(req.query).then((users) => {
+    UserModel.get(req).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send('error', err.message);
+        res.send({type: 'error', message: err.message});
     });
 });
 
@@ -50,7 +60,7 @@ Router.post('/', CheckAuth, async (req, res, next) => {
     UserModel.createNewPatient(body.newPatient).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send('error', err.message);
+        res.send({type: 'error', message: err.message});
     });
 });
 

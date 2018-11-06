@@ -50,6 +50,7 @@ module.exports = {
         event.year = moment(event.fullDate).get('year');
         event.month = moment(event.fullDate).get('month');
         event.date = moment(event.fullDate).get('date');
+        event.doctor = ObjectId(event.doctor);
 
         const usersEvents = this.getEventsByUserId(existedUser._id);
 
@@ -112,6 +113,8 @@ module.exports = {
         event.year = moment(event.fullDate).get('year');
         event.month = moment(event.fullDate).get('month');
         event.date = moment(event.fullDate).get('date');
+
+        event.doctor = ObjectId(event.doctor);
 
         const usersEvents = await this.getEventsByUserId(user._id);
 
