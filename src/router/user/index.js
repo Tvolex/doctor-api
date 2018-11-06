@@ -38,15 +38,20 @@ Router.get('/:id', async (req, res, next) => {
 });
 
 Router.get('/', async (req, res, next) => {
-    const users = await UserModel.get(req.query);
-
-    res.send(users);
+    UserModel.get(req.query).then((users) => {
+        res.send(users);
+    }).catch((err) => {
+        res.send('error', err.message);
+    });
 });
 
 Router.post('/', CheckAuth, async (req, res, next) => {
-    const user = await UserModel.create(req);
-
-    res.send(user);
+    const { body } = req;
+    UserModel.createNewPatient(body.newPatient).then((users) => {
+        res.send(users);
+    }).catch((err) => {
+        res.send('error', err.message);
+    });
 });
 
 

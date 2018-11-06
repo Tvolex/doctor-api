@@ -108,6 +108,9 @@ module.exports = {
         patient.fullName = `${patient.surname} ${patient.name} ${patient.patronymic}`;
         patient.personalKey = keygen._({forceUppercase: true});
         patient.type = 'patient';
+        patient.createdBy = {
+            date: new Date().toISOString(),
+        };
 
         try {
             await Collections.users.insertOne(patient);
@@ -116,6 +119,8 @@ module.exports = {
             console.log(err);
             throw err;
         }
+
+        console.log('Created new user with id: ' + patient._id);
 
         return this.getById(patient._id);
     },
