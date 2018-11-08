@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { OBJECT_ID_REGEX, EVENT_STATUS } = require('../../const');
 
 const currentDate = new Date();
 
@@ -15,13 +16,20 @@ const passportSeries = Joi.string().max(4).required();
 const passportNumber = Joi.number().required();
 const personalKey = Joi.string().required();
 
+const status = Joi.string().valid(Object.values(EVENT_STATUS));
+
 module.exports = {
-    event: Joi.object().keys({
+    createEvent: Joi.object().keys({
         date: Joi.date().required(),
-        doctor: Joi.string().required(),
+        doctor: Joi.string().regex(OBJECT_ID_REGEX).required(),
+        status: status.default(EVENT_STATUS.PLANNED),
         specialization: Joi.string().required(),
         time: Joi.string().required(),
     }),
+    updateEventStatus: {
+        _id: Joi.string().regex(OBJECT_ID_REGEX).required(),
+        status: status.required(),
+    },
     personalKey: Joi.string().required(),
     newPatient: Joi.object().keys({
         email,

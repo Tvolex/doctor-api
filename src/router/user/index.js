@@ -35,15 +35,15 @@ Router.get('/patients', CheckAuth, async (req, res, next) => {
     UserModel.get(req, {filterByEvents: true}).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send({type: 'error', message: err.message});
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     });
 });
 
-Router.get('/:id', async (req, res, next) => {
-    UserModel.getById(req.query).then((users) => {
+Router.get('/:_id', async (req, res, next) => {
+    UserModel.getById(req.params._id).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send({type: 'error', message: err.message});
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     });
 });
 
@@ -51,7 +51,7 @@ Router.get('/', async (req, res, next) => {
     UserModel.get(req).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send({type: 'error', message: err.message});
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     });
 });
 
@@ -60,7 +60,7 @@ Router.post('/', CheckAuth, async (req, res, next) => {
     UserModel.createNewPatient(body.newPatient).then((users) => {
         res.send(users);
     }).catch((err) => {
-        res.send({type: 'error', message: err.message});
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     });
 });
 

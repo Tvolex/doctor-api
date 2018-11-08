@@ -53,9 +53,7 @@ Router.post('/login', async (req, res, next) => {
         console.log(`User ${user._id} logged in`);
 
     } catch (err) {
-        err.status = 500;
-        console.log(err);
-        throw err;
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     }
 
     delete user.password;
@@ -86,12 +84,8 @@ Router.get('/check', async (req, res, next) => {
     let user;
     try {
         user = await UserModel.getById(uId);
-    } catch (ex) {
-        return res.status(500)
-            .send({
-                type: 'error',
-                message: "Error UserModel.getById"
-            })
+    } catch (err) {
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     }
 
     delete user.password;

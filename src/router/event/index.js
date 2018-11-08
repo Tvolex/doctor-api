@@ -33,19 +33,61 @@ Router.post('/', async (req, res, next) => {
     } catch (err) {
         console.log(err);
 
-        if (err.isCustom) {
-            return res.status(err.status).send({type: 'info', message: err.message});
-        }
-
-        return res.status(500)
-            .send({
-                type: 'error',
-                message: "Error in EventModel"
-            })
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
     }
 
     return res
-        .status(200)
+        .status(500)
+        .send({ type: 'error', message: 'Something went wrong'});
+
+});
+
+Router.put('/status/:_id', async (req, res, next) => {
+    const { body: { status } } = req;
+    const { _id } = req.params;
+
+    let eventAfterUpdate;
+    try {
+        eventAfterUpdate = await EventModel.updateStatus({ _id, status});
+    } catch (err) {
+        console.log(err);
+
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    }
+
+    if (eventAfterUpdate.status === status) {
+        return res
+            .status(200)
+            .send({ type: 'info', message: `Статус успішно встановлений на ${status}`});
+    }
+
+    return res
+        .status(500)
+        .send({ type: 'error', message: 'Something went wrong'});
+
+});
+
+Router.put('/:_id', async (req, res, next) => {
+    const { body: { status } } = req;
+    const { _id } = req.params;
+
+    let eventAfterUpdate;
+    try {
+
+    } catch (err) {
+        console.log(err);
+
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    }
+
+    // if (eventAfterUpdate.status === status) {
+    //     return res
+    //         .status(200)
+    //         .send({ type: 'info', message: `Статус успішно встановлений на ${status}`});
+    // }
+
+    return res
+        .status(500)
         .send({ type: 'error', message: 'Something went wrong'});
 
 });

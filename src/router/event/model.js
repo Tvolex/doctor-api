@@ -17,13 +17,13 @@ function customErr(description, status) {
 module.exports = {
 
     async getEventsByUserId(id) {
-        return Collections.events.find({user: ObjectId(id)}).toArray();
+        return Collections.events.find({user: ObjectId(id)}).sort({fullDate: -1}).toArray();
     },
 
     async create(body) {
         let event;
         try {
-            event = await Joi.validate(body.event, Schema.event);
+            event = await Joi.validate(body.event, Schema.createEvent);
         } catch (err) {
             return customErr(err.message, 400);
         }
@@ -82,10 +82,27 @@ module.exports = {
         return UserModel.getById(user._id);
     },
 
+    async updateStatus(_id, status) {
+        let event;
+        try {
+            event = await Joi.validate({_id, status}, Schema.updateEventStatus);
+        } catch (err) {
+            throw err;
+        }
+
+        return Collections.events.findOneAndUpdate({
+            _id: ObjectId(event._id),
+        },{
+            status: event.status,
+        }, {
+            returnNewDocument: true,
+        });
+    },
+
     async createByPersonalKey(body) {
         let event;
         try {
-            event = await Joi.validate(body.event, Schema.event);
+            event = await Joi.validate(body.event, Schema.createEvent);
         } catch (err) {
             return customErr(err.message, 400);
         }

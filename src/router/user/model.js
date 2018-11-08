@@ -118,11 +118,41 @@ module.exports = {
         return Collections.users.aggregate(pipeline).toArray();
     },
     async getById(id) {
-        return Collections.users.find({_id: ObjectId(id)}).next();
-    },
+        const pipeline = [
+            {
+                $match: {
+                    _id: ObjectId(id),
+                }
+            },
+            {
+                $lookup: {
+                    from: 'events',
+                    let: {
+                        user: ObjectId(id),
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $or: [
+                                        {
+                                            $eq: ['$doctor', '$$user'],
 
-    async getPatients({ type,}) {
+                                        },
+                                        {
+                                            $eq: ['$patient', '$$user'],
+                                        },
+                                    ],
+                                }
+                            }
+                        }
+                    ],
+                    as: 'events',
+                }
+            },
+        ];
 
+        return Collections.users.aggregate(pipeline).next();
     },
 
     async getUserByPersonalKey(personalKey) {
