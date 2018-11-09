@@ -163,6 +163,10 @@ module.exports = {
         return Collections.users.findOne(match);
     },
 
+    async find(match) {
+        return Collections.users.find(match).toArray();
+    },
+
     async createNewPatient(newPatient) {
         let patient;
         try {

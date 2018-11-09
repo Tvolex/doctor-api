@@ -36,7 +36,7 @@ module.exports = {
         }
 
         const existedUser = await UserModel.findOne({email: patient.email});
-        if (existedUser) {
+        if (existedUser !== null) {
             return customErr('Користувач з таким емайлом вже зареєстрований!', 400);
         }
 
@@ -51,16 +51,6 @@ module.exports = {
         event.month = moment(event.fullDate).get('month');
         event.date = moment(event.fullDate).get('date');
         event.doctor = ObjectId(event.doctor);
-
-        const usersEvents = this.getEventsByUserId(existedUser._id);
-
-        const isEventAlreadyExist = usersEvents.filter(uEvent => _.isEqual(uEvent.fullDate, event.fullDate) &&
-            _.isEqual(uEvent.specialization, event.specialization) &&
-            _.isEqual(uEvent.doctor.toSafeInteger(), event.doctor));
-
-        if (!_.isEmpty(isEventAlreadyExist)) {
-            return customErr('Користувач вже був зареєстрований до поточного лікара, спеціалізацією та датою!', 400);
-        }
 
         const user = await UserModel.createNewPatient(patient);
 
@@ -137,10 +127,10 @@ module.exports = {
 
         const isEventAlreadyExist = usersEvents.filter(uEvent => _.isEqual(uEvent.fullDate, event.fullDate) &&
             _.isEqual(uEvent.specialization, event.specialization) &&
-            _.isEqual(uEvent.doctor.toString(), event.doctor));
+            _.isEqual(uEvent.doctor.toString(), event.doctor.toString()));
 
         if (!_.isEmpty(isEventAlreadyExist)) {
-            return customErr('Користувач вже був зареєстрований до поточного лікара, спеціалізацією та датою!', 400);
+            return customErr('Користувач вже був зареєстрований до поточного лікаря, за поточною спеціалізацією та датою!', 400);
         }
 
         const eventFullData = {
