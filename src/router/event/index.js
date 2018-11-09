@@ -92,5 +92,21 @@ Router.put('/:_id', async (req, res, next) => {
 
 });
 
+Router.get('/busy', async (req, res, next) => {
+    const { doctor, fullDate } = req.query;
+
+    let isDoctorBusy;
+    try {
+        isDoctorBusy = await EventModel.isDoctorBusy(doctor, fullDate);
+    } catch (err) {
+        console.log(err);
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    }
+
+    return res
+        .status(200)
+        .send(isDoctorBusy);
+});
+
 
 module.exports = Router;

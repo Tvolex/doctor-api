@@ -20,6 +20,18 @@ module.exports = {
         return Collections.events.find({user: ObjectId(id)}).sort({fullDate: -1}).toArray();
     },
 
+    async isDoctorBusy(_id, fullDate) {
+        const doctorEvents = await this.getEventsByUserId(_id);
+
+        doctorEvents.forEach(event => {
+            if (_.isEqual(event.fullDate, fullDate)) {
+                return true;
+            }
+        });
+
+        return false;
+    },
+
     async create(body) {
         let event;
         try {
@@ -51,6 +63,10 @@ module.exports = {
         event.month = moment(event.fullDate).get('month');
         event.date = moment(event.fullDate).get('date');
         event.doctor = ObjectId(event.doctor);
+
+        if (await this.isDoctorBusy(event.doctor, event.fullDate)) {
+            return customErr('Нажаль лікар зайнятий на цей час, будь-ласка виберіть інший!', 400);
+        }
 
         const user = await UserModel.createNewPatient(patient);
 
