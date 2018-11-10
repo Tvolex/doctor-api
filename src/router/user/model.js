@@ -128,7 +128,7 @@ module.exports = {
                 $lookup: {
                     from: 'events',
                     let: {
-                        user: ObjectId(id),
+                        user: '$_id',
                     },
                     pipeline: [
                         {

@@ -104,7 +104,7 @@ module.exports = {
 
         const eventFullData = {
             ...event,
-            user: user._id,
+            patient: user._id,
         };
 
         try {
@@ -184,7 +184,7 @@ module.exports = {
 
         const eventFullData = {
             ...event,
-            user: user._id,
+            patient: user._id,
         };
 
         return Collections.events.insertOne(eventFullData);
