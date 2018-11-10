@@ -86,6 +86,7 @@ module.exports = {
             .set('hour', hour)
             .set('minute', minute)
             .startOf('second')
+            .utc()
             .format();
         event.year = moment(event.fullDate).get('year');
         event.month = moment(event.fullDate).get('month');
@@ -160,6 +161,7 @@ module.exports = {
             .set('hour', hour)
             .set('minute', minute)
             .startOf('second')
+            .utc()
             .format();
         event.year = moment(event.fullDate).get('year');
         event.month = moment(event.fullDate).get('month');
