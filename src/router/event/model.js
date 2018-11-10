@@ -52,7 +52,7 @@ module.exports = {
         let busy = false;
 
         doctorEvents.forEach(event => {
-            if (_.isEqual(event.fullDate, fullDate)) {
+            if (_.isEqual(moment(event.fullDate, "YYYY-MM-DD:HH-mm"), moment(fullDate, "YYYY-MM-DD:HH-mm"))) {
                 busy = true;
             }
         });
@@ -82,15 +82,14 @@ module.exports = {
 
         const [ hour, minute ] = event.time.split(':');
 
-        event.fullDate = moment(event.date)
+        event.fullDate = moment(event.date, "YYYY-MM-DD")
             .set('hour', hour)
             .set('minute', minute)
             .startOf('second')
-            .utc()
-            .format();
-        event.year = moment(event.fullDate).get('year');
-        event.month = moment(event.fullDate).get('month');
-        event.date = moment(event.fullDate).get('date');
+            .format("YYYY-MM-DD:HH-mm");
+        event.year = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('year');
+        event.month = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('month');
+        event.date = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('date');
         event.doctor = ObjectId(event.doctor);
 
         if (await this.isDoctorBusy(event.doctor, event.fullDate)) {
@@ -157,15 +156,14 @@ module.exports = {
 
         const [ hour, minute ] = event.time.split(':');
 
-        event.fullDate = moment(event.date)
+        event.fullDate = moment(event.date, "YYYY-MM-DD")
             .set('hour', hour)
             .set('minute', minute)
             .startOf('second')
-            .utc()
-            .format();
-        event.year = moment(event.fullDate).get('year');
-        event.month = moment(event.fullDate).get('month');
-        event.date = moment(event.fullDate).get('date');
+            .format("YYYY-MM-DD:HH-mm");
+        event.year = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('year');
+        event.month = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('month');
+        event.date = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('date');
 
         event.doctor = ObjectId(event.doctor);
 
@@ -202,10 +200,10 @@ module.exports = {
         }
 
         const plannedUserEvents = userEvents.filter(event =>
-            moment(event.fullDate)
+            moment(event.fullDate, "YYYY-MM-DD:HH-mm")
                 .isBetween(
-                    moment(fullDate).startOf('day'),
-                    moment(fullDate).endOf('day')
+                    moment(fullDate, "YYYY-MM-DD:HH-mm").startOf('day'),
+                    moment(fullDate, "YYYY-MM-DD:HH-mm").endOf('day')
                 )
         );
 

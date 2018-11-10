@@ -19,7 +19,16 @@ const passportNumber = Joi.number();
 const type = Joi.string().valid(['doctor', 'patient']);
 const personalKey = Joi.string().min(32).max(32);
 
+const specialization = Joi.array().items(Joi.string());
+
 module.exports = {
+    createNewDoctor: Joi.object().keys({
+        email: email.required(),
+        name: name.required(),
+        specialization: specialization.required(),
+        surname: surname.required(),
+        patronymic: patronymic.required(),
+    }),
     createNewPatient: Joi.object().keys({
         email: email.required(),
         name: name.required(),

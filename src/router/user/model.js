@@ -198,6 +198,37 @@ module.exports = {
         return this.getById(patient._id);
     },
 
+    async createNewDoctor(newDoctor) {
+        let doctor;
+        try {
+            doctor = await Joi.validate(newDoctor, Schema.createNewDoctor);
+        } catch (err) {
+            err.status = 400;
+            console.log(err);
+            throw err;
+        }
+
+        doctor._id = new ObjectId();
+        doctor.fullName = `${doctor.surname} ${doctor.name} ${doctor.patronymic}`;
+        doctor.type = 'doctor';
+        doctor.password = '123';
+        doctor.createdBy = {
+            date: new Date().toISOString(),
+        };
+
+        try {
+            await Collections.users.insertOne(doctor);
+        } catch (err) {
+            err.status = 400;
+            console.log(err);
+            throw err;
+        }
+
+        console.log('Created new user with id: ' + doctor._id);
+
+        return this.getById(doctor._id);
+    },
+
     has(match) {
         return Collections.users.find(match).hasNext();
     }

@@ -57,11 +57,24 @@ Router.get('/', async (req, res, next) => {
 
 Router.post('/', CheckAuth, async (req, res, next) => {
     const { body } = req;
-    UserModel.createNewPatient(body.newPatient).then((users) => {
-        res.send(users);
-    }).catch((err) => {
-        return res.status(err.status || 500).send({type: 'error', message: err.message});
-    });
+    console.log("create New");
+    if (body.newPatient) {
+        UserModel.createNewPatient(body.newPatient).then((patient) => {
+            res.send(patient);
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
+        });
+    } else if (body.newDoctor) {
+        UserModel.createNewDoctor(body.newDoctor).then((doctor) => {
+            res.send(doctor);
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
+        });
+    } else {
+        return res.status(400).send({type: 'error', message: "Need a valid date"});
+    }
+
+
 });
 
 
