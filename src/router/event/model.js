@@ -14,22 +14,50 @@ function customErr(description, status) {
     throw error;
 }
 
+const getWorkTimes = () => {
+
+    const times = [];
+
+    ['10', '11', '12', '13', '14', '15', '16', '17']
+        .forEach(hour => times.push(`${hour}:00`));
+
+    return times;
+};
+
 module.exports = {
 
     async getEventsByUserId(id) {
-        return Collections.events.find({user: ObjectId(id)}).sort({fullDate: -1}).toArray();
+        const pipeline = [];
+
+        pipeline.push({
+            $match: {
+                $or: [
+                    { patient: ObjectId(id) },
+                    { doctor: ObjectId(id) }
+                ]
+            }
+        });
+
+        pipeline.push({
+            $sort: {
+                fullDate: -1,
+            }
+        });
+        return Collections.events.aggregate(pipeline).toArray();
     },
 
     async isDoctorBusy(_id, fullDate) {
         const doctorEvents = await this.getEventsByUserId(_id);
 
+        let busy = false;
+
         doctorEvents.forEach(event => {
             if (_.isEqual(event.fullDate, fullDate)) {
-                return true;
+                busy = true;
             }
         });
 
-        return false;
+        return busy;
     },
 
     async create(body) {
@@ -149,6 +177,11 @@ module.exports = {
             return customErr('Користувач вже був зареєстрований до поточного лікаря, за поточною спеціалізацією та датою!', 400);
         }
 
+        if (await this.isDoctorBusy(event.doctor, event.fullDate)) {
+            return customErr('Нажаль лікар зайнятий на цей час, будь-ласка виберіть інший!', 400);
+        }
+
+
         const eventFullData = {
             ...event,
             user: user._id,
@@ -156,4 +189,26 @@ module.exports = {
 
         return Collections.events.insertOne(eventFullData);
     },
+
+    async getAvailableTimes(doctor, fullDate) {
+        let userEvents;
+
+        try {
+            userEvents = await this.getEventsByUserId(doctor);
+        } catch(err)  {
+            return customErr(err.message, 400);
+        }
+
+        const plannedUserEvents = userEvents.filter(event =>
+            moment(event.fullDate)
+                .isBetween(
+                    moment(fullDate).startOf('day'),
+                    moment(fullDate).endOf('day')
+                )
+        );
+
+        const busyTimes = plannedUserEvents.map(event => event.time);
+
+        return getWorkTimes().filter(time => !busyTimes.includes(time));
+    }
 };

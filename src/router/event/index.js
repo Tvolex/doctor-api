@@ -108,5 +108,16 @@ Router.get('/busy', async (req, res, next) => {
         .send(isDoctorBusy);
 });
 
+Router.get('/times', async (req, res, next) => {
+    const { fullDate, doctor } = req.query;
+
+    EventModel.getAvailableTimes(doctor, fullDate).then((times) => {
+        return res.status(200).send(times);
+    }).catch((err) => {
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    });
+});
+
+
 
 module.exports = Router;
