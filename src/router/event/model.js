@@ -116,7 +116,7 @@ module.exports = {
         return UserModel.getById(user._id);
     },
 
-    async updateStatus(_id, status) {
+    async updateStatus({ _id, status}) {
         let event;
         try {
             event = await Joi.validate({_id, status}, Schema.updateEventStatus);
@@ -127,9 +127,11 @@ module.exports = {
         return Collections.events.findOneAndUpdate({
             _id: ObjectId(event._id),
         },{
-            status: event.status,
+            $set: {
+                status: event.status,
+            }
         }, {
-            returnNewDocument: true,
+            new: true,
         });
     },
 
