@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const _ = require('lodash');
 const ObjectId = require('mongodb').ObjectId;
+const moment = require('moment');
 const keygen = require("keygenerator");
 const { getCollections } = require('../../db');
 const Schema = require('./Joi.schema');
@@ -180,6 +181,7 @@ module.exports = {
         patient._id = new ObjectId();
         patient.fullName = `${patient.surname} ${patient.name} ${patient.patronymic}`;
         patient.personalKey = keygen._({forceUppercase: true});
+        patient.birthdate = moment(patient.birthdate).format("YYYY-MM-DD");
         patient.type = 'patient';
         patient.createdBy = {
             date: new Date().toISOString(),
