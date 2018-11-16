@@ -15,6 +15,7 @@ const defaultUserProject = {
     fullName: 1,
     birthdate: 1,
     city: 1,
+    admin: 1,
     street: 1,
     house: 1,
     apartment: 1,
@@ -106,8 +107,27 @@ module.exports = {
                             },
                         ],
                         as: 'events',
+                    },
+                },
+                {
+                    $unwind: {
+                        path : "$events",
+                        preserveNullAndEmptyArrays: false,
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        patient: {
+                            "$first": "$$ROOT"
+                        }
                     }
                 },
+                {
+                    $replaceRoot: {
+                        newRoot: "$patient"
+                    }
+                }
             ]);
         }
 

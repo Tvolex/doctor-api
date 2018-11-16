@@ -12,6 +12,7 @@ const defaultUserProject = {
     patronymic: 1,
     birthdate: 1,
     city: 1,
+    admin: 1,
     street: 1,
     house: 1,
     apartment: 1,
