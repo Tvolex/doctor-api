@@ -138,7 +138,7 @@ module.exports = {
 
         return Collections.users.aggregate(pipeline).toArray();
     },
-    async getById(id) {
+    async getById(id, doctor) {
         const pipeline = [
             {
                 $match: {
@@ -150,18 +150,26 @@ module.exports = {
                     from: 'events',
                     let: {
                         user: '$_id',
+                        isPatient: {
+                            $cond: [
+                                { $eq: ['$type', 'patient'] },
+                                true,
+                                false,
+                            ],
+                        },
                     },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
-                                    $or: [
+                                    $cond: [
+                                        "$$isPatient",
+                                        {
+                                            $eq: ['$patient', '$$user'],
+                                        },
                                         {
                                             $eq: ['$doctor', '$$user'],
 
-                                        },
-                                        {
-                                            $eq: ['$patient', '$$user'],
                                         },
                                     ],
                                 }
