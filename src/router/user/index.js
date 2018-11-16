@@ -32,7 +32,7 @@ Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
 });
 
 Router.get('/patients', CheckAuth, async (req, res, next) => {
-    UserModel.get(req, {filterByEvents: true}).then((users) => {
+    UserModel.get(req, { filterByEvents: true }).then((users) => {
         res.send(users);
     }).catch((err) => {
         return res.status(err.status || 500).send({type: 'error', message: err.message});
@@ -40,7 +40,9 @@ Router.get('/patients', CheckAuth, async (req, res, next) => {
 });
 
 Router.get('/:_id', async (req, res, next) => {
-    UserModel.getById(req.params._id).then((users) => {
+    const { params: { _id }, query: { doctor = null } } = req;
+
+    UserModel.getById(_id, doctor).then((users) => {
         res.send(users);
     }).catch((err) => {
         return res.status(err.status || 500).send({type: 'error', message: err.message});

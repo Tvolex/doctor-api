@@ -176,6 +176,45 @@ module.exports = {
         return Collections.users.aggregate(pipeline).next();
     },
 
+    async getEventsByPatient(patient, doctor) {
+        const $and = [];
+
+        if (doctor) {
+            $and.push({ $eq: ['$doctor', ObjectId(doctor)] });
+        }
+        if (patient) {
+            $and.push({  $eq: ['$patient', '$$patient'] });
+        }
+
+        const pipeline = [
+            {
+                $match: {
+                    _id: ObjectId(uId),
+                }
+            },
+            {
+                $lookup: {
+                    from: 'events',
+                    let: {
+                        patient: '$_id',
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and
+                                }
+                            }
+                        }
+                    ],
+                    as: 'events',
+                }
+            },
+        ];
+
+        return Collections.users.aggregate(pipeline).next();
+    },
+
     async getUserByPersonalKey(personalKey) {
         return Collections.users.find({personalKey}).next();
     },

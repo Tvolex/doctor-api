@@ -108,6 +108,16 @@ Router.get('/busy', async (req, res, next) => {
         .send(isDoctorBusy);
 });
 
+Router.get('/', async (req, res, next) => {
+    const { doctor, patient } = req.query;
+
+    EventModel.getEventsByUserId({doctor, patient}).then((events) => {
+        return res.status(200).send(events);
+    }).catch((err) => {
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    });
+});
+
 Router.get('/times', async (req, res, next) => {
     const { fullDate, doctor } = req.query;
     console.log(`Get times. full date: ${fullDate}`);
