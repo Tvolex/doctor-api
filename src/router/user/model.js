@@ -7,6 +7,13 @@ const { getCollections } = require('../../db');
 const Schema = require('./Joi.schema');
 const Collections = getCollections();
 
+function customErr(description, status) {
+    const error = new Error(description);
+    error.status = status || 500;
+    error.isCustom = true;
+    throw error;
+}
+
 const defaultUserProject = {
     city: 1,
     name: 1,
@@ -275,6 +282,13 @@ module.exports = {
             err.status = 400;
             console.log(err);
             throw err;
+        }
+
+        if ( await this.has({ email: patient.email }) ) {
+            return customErr('Цей Email вже використовуэться іншим пацієнтом!', 400);
+        }
+        if ( await this.has({ passportSeries: patient.passportSeries, passportNumber: patient.passportNumber}) ) {
+            return customErr('Пацієнт з такими паспортними даними вже існує!', 400);
         }
 
         patient._id = new ObjectId();

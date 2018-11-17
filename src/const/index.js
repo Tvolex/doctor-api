@@ -1,8 +1,8 @@
 module.exports = {
     EVENT_STATUS: {
-        PLANNED: "planned",
-        PASSED: "passed",
-        REJECTED: "rejected",
+        PLANNED: "заплановано",
+        PASSED: "завершено",
+        REJECTED: "відхилено",
     },
     OBJECT_ID_REGEX: /^[0-9a-fA-F]{24}$/,
 }
