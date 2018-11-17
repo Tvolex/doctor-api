@@ -14,6 +14,7 @@ const defaultUserProject = {
     patronymic: 1,
     fullName: 1,
     birthdate: 1,
+    events: 1,
     city: 1,
     admin: 1,
     street: 1,
@@ -145,33 +146,59 @@ module.exports = {
                     _id: ObjectId(id),
                 }
             },
+        ];
+
+        pipeline.push({
+            $project: defaultUserProject,
+        });
+
+        return Collections.users.aggregate(pipeline).next();
+    },
+
+    async getUserWithEvents(id, doctor) {
+        let lookupMatchPipeline;
+
+        if (doctor) {
+            lookupMatchPipeline = {
+                $and: [
+                    {
+                        $eq: ['$patient', '$$user'],
+                    },
+                    {
+                        $eq: ['$doctor', ObjectId(doctor)],
+                    },
+                ],
+            }
+        } else {
+            lookupMatchPipeline = {
+                $or: [
+                    {
+                        $eq: ['$patient', '$$user'],
+                    },
+                    {
+                        $eq: ['$doctor', '$$user'],
+                    },
+                ],
+            }
+        }
+
+        const pipeline = [
+            {
+                $match: {
+                    _id: ObjectId(id),
+                }
+            },
             {
                 $lookup: {
                     from: 'events',
                     let: {
                         user: '$_id',
-                        isPatient: {
-                            $cond: [
-                                { $eq: ['$type', 'patient'] },
-                                true,
-                                false,
-                            ],
-                        },
                     },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
-                                    $cond: [
-                                        "$$isPatient",
-                                        {
-                                            $eq: ['$patient', '$$user'],
-                                        },
-                                        {
-                                            $eq: ['$doctor', '$$user'],
-
-                                        },
-                                    ],
+                                    ...lookupMatchPipeline,
                                 }
                             }
                         }
@@ -180,6 +207,10 @@ module.exports = {
                 }
             },
         ];
+
+        pipeline.push({
+            $project: defaultUserProject,
+        });
 
         return Collections.users.aggregate(pipeline).next();
     },

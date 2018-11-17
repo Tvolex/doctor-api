@@ -39,14 +39,27 @@ Router.get('/patients', CheckAuth, async (req, res, next) => {
     });
 });
 
-Router.get('/:_id', async (req, res, next) => {
-    const { params: { _id }, query: { doctor = null } } = req;
+Router.get('/:_id', CheckAuth, async (req, res, next) => {
+    const { params: { _id } } = req;
 
-    UserModel.getById(_id, doctor).then((users) => {
-        res.send(users);
-    }).catch((err) => {
-        return res.status(err.status || 500).send({type: 'error', message: err.message});
-    });
+    const existUser = await UserModel.getById(req.session.uId);
+
+    if (existUser.admin) {
+        // return res.status(401).send({type: 'error', message: "Переглянути дані про пацієнтів не можливо. Доступно тільки для адміністраторів!"});
+        UserModel.getUserWithEvents(_id).then((users) => {
+            res.send(users);
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
+        });
+    } else {
+        UserModel.getUserWithEvents(_id, req.session.uId).then((users) => {
+            res.send(users);
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
+        });
+    }
+
+
 });
 
 Router.get('/', async (req, res, next) => {
