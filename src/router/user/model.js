@@ -147,6 +147,97 @@ module.exports = {
 
         return Collections.users.aggregate(pipeline).toArray();
     },
+
+    async getPatients(req) {
+        console.log('Get users');
+        let params;
+        try {
+            params = await Joi.validate(req.query, Schema.get);
+        } catch (err) {
+            err.status = 400;
+            console.log(err);
+            throw err;
+        }
+
+        const pipeline = [];
+
+        if (!_.isEmpty(params.filter)) {
+            pipeline.push({
+                $match: {
+                    $and: filterBuilder(params.filter),
+                }
+            });
+        }
+
+        pipeline.push(...[
+            {
+                $match: {
+                    type:  'patient',
+                }
+            },
+            {
+                $lookup: {
+                    from: 'events',
+                    let: {
+                        patient: '$_id',
+                        doctor: ObjectId(req.session.uId),
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$doctor', '$$doctor'] },
+                                        { $eq: ['$patient', '$$patient'] },
+                                    ],
+
+                                }
+                            }
+                        },
+                    ],
+                    as: 'events',
+                },
+            },
+            {
+                $addFields: {
+                    "hadEvents": {
+                        $cond: [
+                            {$ne: ["$events", []]},
+                            true,
+                            false
+                        ],
+                    },
+                },
+            },
+            {
+                $facet: {
+                    withEvents: [
+                        {
+                            $match: {
+                                "hadEvents": true,
+                            }
+                        },
+                        {
+                            $project: defaultUserProject,
+                        }
+                    ],
+                    withoutEvents: [
+                        {
+                            $match: {
+                                "hadEvents": false,
+                            }
+                        },
+                        {
+                            $project: defaultUserProject,
+                        }
+                    ]
+                }
+            },
+        ]);
+
+        return Collections.users.aggregate(pipeline).next();
+    },
+
     async getById(id, doctor) {
         const pipeline = [
             {
