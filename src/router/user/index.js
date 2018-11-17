@@ -46,14 +46,14 @@ Router.get('/:_id', CheckAuth, async (req, res, next) => {
 
     if (existUser.admin) {
         // return res.status(401).send({type: 'error', message: "Переглянути дані про пацієнтів не можливо. Доступно тільки для адміністраторів!"});
-        UserModel.getUserWithEvents(_id).then((users) => {
-            res.send(users);
+        UserModel.getUserWithEvents(_id).then((user) => {
+            res.send(user);
         }).catch((err) => {
             return res.status(err.status || 500).send({type: 'error', message: err.message});
         });
     } else {
-        UserModel.getUserWithEvents(_id, req.session.uId).then((users) => {
-            res.send(users);
+        UserModel.getUserWithEvents(_id, req.session.uId).then((user) => {
+            res.send(user);
         }).catch((err) => {
             return res.status(err.status || 500).send({type: 'error', message: err.message});
         });

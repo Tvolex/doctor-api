@@ -8,21 +8,22 @@ const Schema = require('./Joi.schema');
 const Collections = getCollections();
 
 const defaultUserProject = {
-    email: 1,
+    city: 1,
     name: 1,
+    type: 1,
+    email: 1,
+    admin: 1,
+    house: 1,
+    street: 1,
+    events: 1,
     surname: 1,
-    patronymic: 1,
     fullName: 1,
     birthdate: 1,
-    events: 1,
-    city: 1,
-    admin: 1,
-    street: 1,
-    house: 1,
     apartment: 1,
+    patronymic: 1,
+    personalKey: 1,
     passportSeries: 1,
     passportNumber: 1,
-    type: 1,
     specialization: 1,
 };
 
