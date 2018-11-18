@@ -169,6 +169,51 @@ module.exports = {
             });
         }
 
+        if (!_.isEmpty(params.search)) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        {
+                            email: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            fullName: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            city: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            street: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            birthdate: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            passportNumber: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                    ],
+                }
+            });
+        }
+
         pipeline.push(...[
             {
                 $match: {

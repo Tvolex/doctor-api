@@ -3,6 +3,8 @@ Joi.ObjectId = require('joi-objectid')(Joi);
 
 const currentDate = new Date();
 
+const search = Joi.string().allow(['']).default(null);
+
 const _id = Joi.ObjectId();
 const email = Joi.string().email({ minDomainAtoms: 2 });
 const password = Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/);
@@ -53,6 +55,7 @@ module.exports = {
             type: Joi.array().items(type),
             specialization: Joi.array().items(Joi.string()),
         }),
+        search,
     }),
 
     has: Joi.object().keys({
