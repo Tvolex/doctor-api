@@ -22,7 +22,7 @@ Router.post('/', async (req, res, next) => {
             if (user) {
                 return res
                     .status(200)
-                    .send({ type: 'info', message: `Ви були зареєстровані, при наступному запису використовуйте цей ключ: ${user.personalKey}`});
+                    .send({ type: 'info', message: `Ви були успішно зареєстровані! Ваш персональний ключ був відправлений вам на пошту (також перевірте СПАМ).`});
             }
         } else {
             return res.status(400).send({

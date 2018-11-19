@@ -62,7 +62,7 @@ Router.get('/:_id', CheckAuth, async (req, res, next) => {
 
 });
 
-Router.get('/', async (req, res, next) => {
+Router.get('/', CheckAuth, async (req, res, next) => {
     UserModel.get(req).then((users) => {
         res.send(users);
     }).catch((err) => {
@@ -86,10 +86,8 @@ Router.post('/', CheckAuth, async (req, res, next) => {
             return res.status(err.status || 500).send({type: 'error', message: err.message});
         });
     } else {
-        return res.status(400).send({type: 'error', message: "Need a valid date"});
+        return res.status(400).send({type: 'error', message: "Need a valid data"});
     }
-
-
 });
 
 

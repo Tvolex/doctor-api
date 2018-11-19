@@ -4,6 +4,7 @@ const ObjectId = require('mongodb').ObjectId;
 const moment = require('moment');
 const keygen = require("keygenerator");
 const { getCollections } = require('../../db');
+const Notificator = require('../notification');
 const Schema = require('./Joi.schema');
 const Collections = getCollections();
 
@@ -445,6 +446,9 @@ module.exports = {
         }
 
         console.log('Created new user with id: ' + patient._id);
+
+        // Notificator.sendSMS('+380508554730', `Ваш персональний ключ: ${patient.personalKey}`);
+        Notificator.sendEmail(patient.email, `Ваш персональний ключ: </b>${patient.personalKey}</b> . При наступному записі просто використовуйте цей ключ.`);
 
         return this.getById(patient._id);
     },
