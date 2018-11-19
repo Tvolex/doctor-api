@@ -62,7 +62,7 @@ Router.get('/:_id', CheckAuth, async (req, res, next) => {
 
 });
 
-Router.get('/', CheckAuth, async (req, res, next) => {
+Router.get('/', async (req, res, next) => {
     UserModel.get(req).then((users) => {
         res.send(users);
     }).catch((err) => {
