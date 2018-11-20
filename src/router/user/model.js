@@ -268,9 +268,27 @@ module.exports = {
                     ],
                     withoutEvents: [
                         {
+                            $lookup: {
+                                from: 'events',
+                                let: {
+                                    patient: '$_id',
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ['$patient', '$$patient']
+                                            },
+                                        }
+                                    },
+                                ],
+                                as: 'events',
+                            },
+                        },
+                        {
                             $match: {
-                                "hadEvents": false,
-                            }
+                                events: { $eq: [] },
+                            },
                         },
                         {
                             $project: defaultUserProject,
