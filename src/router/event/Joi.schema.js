@@ -23,7 +23,7 @@ module.exports = {
         date: Joi.date().required(),
         doctor: Joi.string().regex(OBJECT_ID_REGEX).required(),
         status: status.default(EVENT_STATUS.PLANNED),
-        specialization: Joi.string().required(),
+        specialization: Joi.string().regex(OBJECT_ID_REGEX).required(),
         time: Joi.string().required(),
     }),
     updateEventStatus: {

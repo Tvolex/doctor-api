@@ -28,7 +28,7 @@ const initCollections = async () => {
     if (isConnected) {
         Collections.users = client.db('dev').collection('users');
         Collections.events = client.db('dev').collection('events');
-
+        Collections.specializations = client.db('dev').collection('specializations');
         return Collections;
     }
     return null;

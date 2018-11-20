@@ -1,5 +1,6 @@
 const Joi = require('joi');
 Joi.ObjectId = require('joi-objectid')(Joi);
+const { OBJECT_ID_REGEX } = require('../../const');
 
 const currentDate = new Date();
 
@@ -21,7 +22,7 @@ const passportNumber = Joi.number();
 const type = Joi.string().valid(['doctor', 'patient']);
 const personalKey = Joi.string().min(32).max(32);
 
-const specialization = Joi.array().items(Joi.string());
+const specialization = Joi.array().items(Joi.string().regex(OBJECT_ID_REGEX));
 
 module.exports = {
     createNewDoctor: Joi.object().keys({
@@ -53,7 +54,7 @@ module.exports = {
             house,
             apartment,
             type: Joi.array().items(type),
-            specialization: Joi.array().items(Joi.string()),
+            specialization,
         }),
         search,
     }),
