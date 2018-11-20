@@ -26,7 +26,15 @@ Router.post('/login', async (req, res, next) => {
                 })
         }
 
-        if (user.password !== password) {
+        if (_.isEqual(user.type, 'patient')) {
+            return res.status(400)
+                .send({
+                    type: 'error',
+                    message: "Пацієнти на мають прав!"
+                })
+        }
+
+        if (!_.isEqual(user.password, password)) {
             return res.status(400)
                 .send({
                     type: 'error',

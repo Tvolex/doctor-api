@@ -91,6 +91,7 @@ module.exports = {
         event.month = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('month');
         event.date = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('date');
         event.doctor = ObjectId(event.doctor);
+        event.specialization = ObjectId(event.specialization);
 
         if (await this.isDoctorBusy(event.doctor, event.fullDate)) {
             return customErr('Нажаль лікар зайнятий на цей час, будь-ласка виберіть інший!', 400);
@@ -168,6 +169,7 @@ module.exports = {
         event.date = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('date');
 
         event.doctor = ObjectId(event.doctor);
+        event.specialization = ObjectId(event.specialization);
 
         const usersEvents = await this.getEventsByUserId(user._id);
 

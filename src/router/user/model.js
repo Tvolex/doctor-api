@@ -236,7 +236,6 @@ module.exports = {
                                         { $eq: ['$doctor', '$$doctor'] },
                                         { $eq: ['$patient', '$$patient'] },
                                     ],
-
                                 }
                             }
                         },
@@ -345,6 +344,34 @@ module.exports = {
                                 $expr: {
                                     ...lookupMatchPipeline,
                                 }
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'specializations',
+                                let: {
+                                    specialization: "$specialization",
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ["$_id", "$$specialization"]
+                                            }
+                                        }
+                                    }
+                                ],
+                                as: "specialization"
+                            }
+                        },
+                        {
+                            $unwind: {
+                                path: "$specialization",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                specialization: "$specialization.name",
                             }
                         }
                     ],
