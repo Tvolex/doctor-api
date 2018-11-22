@@ -1,7 +1,9 @@
 const express = require('express');
 const Router = express.Router();
+const _ = require('lodash');
 const CheckAuth = require('../auth/checkAuth');
 const UserModel = require('./model');
+const { EVENT_STATUS } = require('../../const');
 
 const getRandom = () => {
     return Math.floor(Math.random() * (99 - 1)) + 1;
@@ -10,25 +12,53 @@ const getRandom = () => {
 Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
     // const user = await UserModel.get(req);
     console.log('Get Statistics by user: ' + req.session.uId);
-    res.status(200)
-        .send({
-            statistics: {
-                pieChartData: {'Обстежено': getRandom(), 'Записано на обстеження': getRandom()},
-                lineChartData: [
-                    {
-                        name: 'Кількість пацієнтів',
-                        data: {
-                            '2018-11-01': getRandom(),
-                            '2018-11-02': getRandom(),
-                            '2018-11-03': getRandom(),
-                            '2018-11-04': getRandom(),
-                            '2018-11-05': getRandom(),
-                            '2018-11-06': getRandom(),
-                        },
-                    },
-                ]
-            },
+
+    const statistics = {};
+
+    UserModel.getPatients(req, { filterByEvents: true }).then((users) => {
+        const { withEvents, withoutEvents, groupByDate } = users;
+
+        let PlannedEvents = [];
+        let DoneEvents = [];
+        let RejectedEvents = [];
+
+        withEvents.forEach(user => {
+            user.events.forEach(event => PlannedEvents.push(_.isEqual(event.status, EVENT_STATUS.PLANNED)));
+            user.events.forEach(event => DoneEvents.push(_.isEqual(event.status, EVENT_STATUS.PASSED)));
+            user.events.forEach(event => RejectedEvents.push(_.isEqual(event.status, EVENT_STATUS.REJECTED)));
         });
+
+        PlannedEvents = PlannedEvents.filter(v => !!v);
+        DoneEvents = DoneEvents.filter(v => !!v);
+        RejectedEvents = RejectedEvents.filter(v => !!v);
+
+        statistics.pieChartData = {
+            'Мої пацієнти': withEvents.length,
+            'Не записані на обстеження': withoutEvents.length,
+            'Заплановані обстеження': PlannedEvents.length,
+            'Завершені обстеження': DoneEvents.length,
+            'Відхилені обстеження': RejectedEvents.length,
+        };
+
+        statistics.lineChartData = [
+            {
+                name: 'Кількість пацієнтів',
+                data: Object.assign({}, ...groupByDate.map(data => {
+                    const date = `${data._id.year}-${data._id.month}-${data._id.date}`;
+                    const resData = {};
+                    resData[date] = data.count;
+                    return resData;
+                }))
+            },
+        ];
+
+        res.status(200).send({
+            statistics,
+        })
+
+    }).catch((err) => {
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    });
 });
 
 Router.get('/patients', CheckAuth, async (req, res, next) => {

@@ -79,6 +79,27 @@ const avatarLookup = [
     }
 ];
 
+const matchByDate = (fromDate, toDate) => {
+    const $and = [];
+    if (fromDate) {
+        $and.push(...[
+            { year: { $gte: new Date(fromDate).getFullYear() } },
+            { month: { $gte: new Date(fromDate).getMonth() } },
+            { date: { $gte: new Date(fromDate).getDate() } },
+        ]);
+    }
+
+    if (toDate) {
+        $and.push(...[
+            { year: { $lte: new Date(toDate).getFullYear() } },
+            { month: { $lte: new Date(toDate).getMonth() } },
+            { date: { $lte: new Date(toDate).getDate() } },
+        ]);
+    }
+
+    return $and;
+};
+
 const filterBuilder = (filters) => {
     const $and = [];
 
@@ -260,6 +281,11 @@ module.exports = {
             });
         }
 
+        let $andForMatchByDate = null;
+        if (params.filter && params.filter.fromDate && params.filter.toDate) {
+            $andForMatchByDate = matchByDate(params.filter.fromDate, params.filter.toDate);
+        }
+
         pipeline.push(...[
             {
                 $match: {
@@ -284,6 +310,17 @@ module.exports = {
                                 }
                             }
                         },
+                        {
+                            $match: {
+                                $and: $andForMatchByDate || [
+                                    {
+                                        $expr: {
+                                            $eq: ["$_id", "$_id"],
+                                        }
+                                    }
+                                ],
+                            }
+                        }
                     ],
                     as: 'events',
                 },
@@ -340,7 +377,34 @@ module.exports = {
                         {
                             $project: defaultUserProject,
                         }
-                    ]
+                    ],
+                    groupByDate: [
+                        {
+                            $match: {
+                                "hadEvents": true,
+                            },
+                        },
+                        {
+                            $replaceRoot: {
+                                newRoot: { events: "$events" }
+                            }
+                        },
+                        {
+                            $unwind: {
+                                path: "$events",
+                            }
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    date: "$events.date",
+                                    month: "$events.month",
+                                    year: "$events.year"
+                                },
+                                count: { $sum: 1 },
+                            }
+                        },
+                    ],
                 }
             },
         ]);
@@ -438,6 +502,35 @@ module.exports = {
                         {
                             $addFields: {
                                 specialization: "$specialization.name",
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                let: {
+                                    patient: "$patient",
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ["$_id", "$$patient"]
+                                            }
+                                        }
+                                    }
+                                ],
+                                as: "patient"
+                            }
+                        },
+                        {
+                            $unwind: {
+                                path: "$patient",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                patient: "$patient._id",
+                                patientFullName: "$patient.fullName",
                             }
                         }
                     ],

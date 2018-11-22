@@ -80,6 +80,11 @@ module.exports = {
             return customErr('Користувач з таким емайлом вже зареєстрований!', 400);
         }
 
+        const existedDoctor = await UserModel.findOne({_id: ObjectId(event.doctor)});
+        if (!existedDoctor) {
+            return customErr('Такого лікаря не існує', 400);
+        }
+
         const [ hour, minute ] = event.time.split(':');
 
         event.fullDate = moment(event.date, "YYYY-MM-DD")
@@ -91,6 +96,7 @@ module.exports = {
         event.month = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('month');
         event.date = moment(event.fullDate, "YYYY-MM-DD:HH-mm").get('date');
         event.doctor = ObjectId(event.doctor);
+        event.cabinet = existedDoctor.cabinet;
         event.specialization = ObjectId(event.specialization);
 
         if (await this.isDoctorBusy(event.doctor, event.fullDate)) {

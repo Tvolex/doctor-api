@@ -60,6 +60,8 @@ module.exports = {
             apartment,
             type: Joi.array().items(type),
             specialization,
+            fromDate: Joi.date(),
+            toDate: Joi.date(),
         }),
         search,
     }),
