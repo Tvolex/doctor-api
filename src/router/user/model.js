@@ -23,6 +23,8 @@ const defaultUserProject = {
     admin: 1,
     house: 1,
     street: 1,
+    avatar: 1,
+    cabinet: 1,
     events: 1,
     surname: 1,
     fullName: 1,
@@ -34,6 +36,48 @@ const defaultUserProject = {
     passportNumber: 1,
     specialization: 1,
 };
+const avatarLookup = [
+    {
+        $lookup: {
+            from: 'images',
+            let: {
+                avatarId: '$avatar',
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$_id", "$$avatarId"]
+                        }
+                    }
+                },
+            ],
+            as: 'avatar',
+        }
+    },
+    {
+        $addFields: {
+            "avatar": {
+                $cond: [
+                    { $eq: ["$avatar", []] },
+                    null,
+                    { $arrayElemAt: ["$avatar", 0] },
+                ]
+            }
+        }
+    },
+    {
+        $addFields: {
+            "avatar": {
+                $cond: [
+                    { $eq: ["$avatar", []] },
+                    null,
+                    "$avatar.Location",
+                ]
+            }
+        }
+    }
+];
 
 const filterBuilder = (filters) => {
     const $and = [];
@@ -141,6 +185,7 @@ module.exports = {
             ]);
         }
 
+        pipeline.push(...avatarLookup);
 
         pipeline.push({
             $project: defaultUserProject,
@@ -262,9 +307,10 @@ module.exports = {
                                 "hadEvents": true,
                             }
                         },
+                        ...avatarLookup,
                         {
                             $project: defaultUserProject,
-                        }
+                        },
                     ],
                     withoutEvents: [
                         {
@@ -290,6 +336,7 @@ module.exports = {
                                 events: { $eq: [] },
                             },
                         },
+                        ...avatarLookup,
                         {
                             $project: defaultUserProject,
                         }
@@ -308,6 +355,7 @@ module.exports = {
                     _id: ObjectId(id),
                 }
             },
+            ...avatarLookup,
         ];
 
         pipeline.push({
@@ -396,6 +444,7 @@ module.exports = {
                     as: 'events',
                 }
             },
+            ...avatarLookup,
         ];
 
         pipeline.push({
@@ -474,6 +523,7 @@ module.exports = {
         }
 
         patient._id = new ObjectId();
+        patient.avatar = patient.avatar ? ObjectId(patient.avatar) : null;
         patient.fullName = `${patient.surname} ${patient.name} ${patient.patronymic}`;
         patient.personalKey = keygen._({forceUppercase: true});
         patient.birthdate = moment(patient.birthdate).format("YYYY-MM-DD");
@@ -509,6 +559,7 @@ module.exports = {
         }
 
         doctor._id = new ObjectId();
+        doctor.avatar = doctor.avatar ? ObjectId(doctor.avatar) : null;
         doctor.fullName = `${doctor.surname} ${doctor.name} ${doctor.patronymic}`;
         doctor.type = 'doctor';
         doctor.password = '123';

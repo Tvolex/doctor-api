@@ -2,13 +2,16 @@
   "name": "doctor-api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "nodemon $NODE_DEBUG_OPTION src/index.js",
+    "dev": "nodemon %NODE_DEBUG_OPTION% src/index.js",
     "debug": "node $NODE_DEBUG_OPTION src/index.js",
     "start": "node src/index.js"
   },
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
+    "aws-s3": "^1.5.5",
+    "aws-sdk": "^2.361.0",
     "body-parser": "^1.18.3",
+    "connect-multiparty": "^2.2.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.4",

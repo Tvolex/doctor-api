@@ -10,8 +10,12 @@ const config = require('../config');
 const { init, initCollections } = require('./db');
 
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.json({
+    strict: false,
+}));
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
 app.use(cookieParser('Kvb6swFdB&m66sk4aSB9pSKm'));
 app.use(session({
     secret: 'Kvb6swFdB&m66sk4aSB9pSKm',
