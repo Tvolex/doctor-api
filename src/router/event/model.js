@@ -200,6 +200,59 @@ module.exports = {
         return Collections.events.insertOne(eventFullData);
     },
 
+    async getAllEvents() {
+        const pipeline = [
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        patient: "$patient",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$patient"],
+                                }
+                            }
+                        }
+                    ],
+                    as: "patient"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$patient"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        doctor: "$doctor",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$doctor"],
+                                }
+                            }
+                        }
+                    ],
+                    as: "doctor"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$doctor"
+                }
+            },
+        ];
+
+        return Collections.events.aggregate(pipeline).toArray();
+    },
+
     async getAvailableTimes(doctor, fullDate) {
         let userEvents;
 
