@@ -82,19 +82,19 @@ const avatarLookup = [
 const matchByDate = (fromDate, toDate) => {
     const $and = [];
     if (fromDate) {
-        $and.push(...[
-            { year: { $gte: new Date(fromDate).getFullYear() } },
-            { month: { $gte: new Date(fromDate).getMonth() } },
-            { date: { $gte: new Date(fromDate).getDate() } },
-        ]);
+        $and.push({
+            fullDate: {
+                $gte: new Date(fromDate),
+            },
+        });
     }
 
     if (toDate) {
-        $and.push(...[
-            { year: { $lte: new Date(toDate).getFullYear() } },
-            { month: { $lte: new Date(toDate).getMonth() } },
-            { date: { $lte: new Date(toDate).getDate() } },
-        ]);
+        $and.push({
+            fullDate: {
+                $lte: new Date(toDate),
+            },
+        });
     }
 
     return $and;
@@ -307,6 +307,16 @@ module.exports = {
                                         { $eq: ['$doctor', '$$doctor'] },
                                         { $eq: ['$patient', '$$patient'] },
                                     ],
+                                }
+                            }
+                        },
+                        {
+                            $addFields: {
+                                fullDate: {
+                                    $dateFromString: {
+                                        dateString: "$fullDate",
+                                        format: "%Y-%m-%d:%H-%M",
+                                    }
                                 }
                             }
                         },
