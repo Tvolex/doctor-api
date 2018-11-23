@@ -2,7 +2,7 @@
   "name": "doctor-api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "nodemon %NODE_DEBUG_OPTION% src/index.js",
+    "dev": "nodemon $NODE_DEBUG_OPTION src/index.js",
     "debug": "node $NODE_DEBUG_OPTION src/index.js",
     "start": "node src/index.js"
   },
@@ -16,6 +16,7 @@
     "cors": "^2.8.4",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
+    "http": "0.0.0",
     "joi": "^14.0.1",
     "joi-objectid": "^2.0.0",
     "keygenerator": "^1.0.4",
