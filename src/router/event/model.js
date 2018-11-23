@@ -4,6 +4,7 @@ const Schema = require('./Joi.schema');
 const _ = require('lodash');
 const ObjectId = require('mongodb').ObjectId;
 const { getCollections } = require('../../db');
+const { EVENT_STATUS } = require('../../const');
 const Collections = getCollections();
 const UserModel = require('../user/model');
 
@@ -200,8 +201,13 @@ module.exports = {
         return Collections.events.insertOne(eventFullData);
     },
 
-    async getAllEvents() {
+    async getEventsByStatus(status = EVENT_STATUS.PLANNED) {
         const pipeline = [
+            {
+                $match: {
+                    status
+                }
+            },
             {
                 $lookup: {
                     from: 'users',
@@ -212,7 +218,9 @@ module.exports = {
                         {
                             $match: {
                                 $expr: {
-                                    $eq: ["$_id", "$$patient"],
+                                    $and: [
+                                        { $eq: ["$_id", "$$patient"] },
+                                    ]
                                 }
                             }
                         }
