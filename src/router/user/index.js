@@ -3,6 +3,7 @@ const Router = express.Router();
 const _ = require('lodash');
 const CheckAuth = require('../auth/checkAuth');
 const UserModel = require('./model');
+const EventModel = require('../event/model');
 const { EVENT_STATUS } = require('../../const');
 
 const getRandom = () => {
@@ -13,52 +14,83 @@ Router.get('/getStatistics', CheckAuth, async (req, res, next) => {
     // const user = await UserModel.get(req);
     console.log('Get Statistics by user: ' + req.session.uId);
 
+    const currenUser = await UserModel.getById(req.session.uId);
+
     const statistics = {};
 
-    UserModel.getPatients(req, { filterByEvents: true }).then((users) => {
-        const { withEvents, withoutEvents, groupByDate } = users;
+    if (currenUser.admin) {
+        EventModel.groupForStatisticsByDoctor(req).then((doctors) => {
+            const countsByDoctor = doctors.map(data => {
+                const title = data.doctor;
+                const resData = {};
+                resData[title] = data.count;
+                return resData;
+            });
 
-        let PlannedEvents = [];
-        let DoneEvents = [];
-        let RejectedEvents = [];
+            statistics.barChartData = [
+                {
+                    name: 'Кількість пацієнтів',
+                    data: Object.assign({}, ...countsByDoctor),
+                }
+            ];
 
-        withEvents.forEach(user => {
-            user.events.forEach(event => PlannedEvents.push(_.isEqual(event.status, EVENT_STATUS.PLANNED)));
-            user.events.forEach(event => DoneEvents.push(_.isEqual(event.status, EVENT_STATUS.PASSED)));
-            user.events.forEach(event => RejectedEvents.push(_.isEqual(event.status, EVENT_STATUS.REJECTED)));
+            statistics.pieChartData = Object.assign({},
+                ...countsByDoctor.filter((el, index) => index < 5)
+            );
+
+            return res.status(200).send({
+                statistics,
+            })
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
         });
 
-        PlannedEvents = PlannedEvents.filter(v => !!v);
-        DoneEvents = DoneEvents.filter(v => !!v);
-        RejectedEvents = RejectedEvents.filter(v => !!v);
+    } else {
+        UserModel.getPatients(req, { forStatistics: true }).then((users) => {
+            const { withEvents, withoutEvents, groupByDate } = users;
 
-        statistics.pieChartData = {
-            'Мої пацієнти': withEvents.length,
-            'Не записані на обстеження': withoutEvents.length,
-            'Заплановані обстеження': PlannedEvents.length,
-            'Завершені обстеження': DoneEvents.length,
-            'Відхилені обстеження': RejectedEvents.length,
-        };
+            let PlannedEvents = [];
+            let DoneEvents = [];
+            let RejectedEvents = [];
 
-        statistics.lineChartData = [
-            {
-                name: 'Кількість пацієнтів',
-                data: Object.assign({}, ...groupByDate.map(data => {
-                    const date = `${data._id.year}-${data._id.month}-${data._id.date}`;
-                    const resData = {};
-                    resData[date] = data.count;
-                    return resData;
-                }))
-            },
-        ];
+            withEvents.forEach(user => {
+                user.events.forEach(event => PlannedEvents.push(_.isEqual(event.status, EVENT_STATUS.PLANNED)));
+                user.events.forEach(event => DoneEvents.push(_.isEqual(event.status, EVENT_STATUS.PASSED)));
+                user.events.forEach(event => RejectedEvents.push(_.isEqual(event.status, EVENT_STATUS.REJECTED)));
+            });
 
-        res.status(200).send({
-            statistics,
-        })
+            PlannedEvents = PlannedEvents.filter(v => !!v);
+            DoneEvents = DoneEvents.filter(v => !!v);
+            RejectedEvents = RejectedEvents.filter(v => !!v);
 
-    }).catch((err) => {
-        return res.status(err.status || 500).send({type: 'error', message: err.message});
-    });
+            statistics.pieChartData = {
+                'Мої пацієнти': withEvents.length,
+                'Не записані на обстеження': withoutEvents.length,
+                'Заплановані обстеження': PlannedEvents.length,
+                'Завершені обстеження': DoneEvents.length,
+                'Відхилені обстеження': RejectedEvents.length,
+            };
+
+            statistics.lineChartData = [
+                {
+                    name: 'Кількість пацієнтів',
+                    data: Object.assign({}, ...groupByDate.map(data => {
+                        const date = `${data._id.year}-${data._id.month}-${data._id.date}`;
+                        const resData = {};
+                        resData[date] = data.count;
+                        return resData;
+                    }))
+                },
+            ];
+
+            return res.status(200).send({
+                statistics,
+            })
+
+        }).catch((err) => {
+            return res.status(err.status || 500).send({type: 'error', message: err.message});
+        });
+    }
 });
 
 Router.get('/patients', CheckAuth, async (req, res, next) => {

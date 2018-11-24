@@ -154,7 +154,7 @@ module.exports = {
             });
         }
 
-        if (option && option.filterByEvents) {
+        if (option && option.forStatistics) {
             pipeline.push(...[
                 {
                     $match: {

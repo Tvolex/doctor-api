@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const moment = require('moment');
 const Schema = require('./Joi.schema');
+const UserSchema = require('../user/Joi.schema');
 const _ = require('lodash');
 const ObjectId = require('mongodb').ObjectId;
 const { getCollections } = require('../../db');
@@ -23,6 +24,27 @@ const getWorkTimes = () => {
         .forEach(hour => times.push(`${hour}:00`));
 
     return times;
+};
+
+const matchByDate = (fromDate, toDate) => {
+    const $and = [];
+    if (fromDate) {
+        $and.push({
+            fullDate: {
+                $gte: new Date(fromDate),
+            },
+        });
+    }
+
+    if (toDate) {
+        $and.push({
+            fullDate: {
+                $lte: new Date(toDate),
+            },
+        });
+    }
+
+    return $and;
 };
 
 module.exports = {
@@ -281,5 +303,90 @@ module.exports = {
         const busyTimes = plannedUserEvents.map(event => event.time);
 
         return getWorkTimes().filter(time => !busyTimes.includes(time));
+    },
+
+    async groupForStatisticsByDoctor(req) {
+        let params;
+        try {
+            params = await Joi.validate(req.query, UserSchema.get);
+        } catch (err) {
+            err.status = 400;
+            console.log(err);
+            throw err;
+        }
+
+        const pipeline = [];
+
+        let $andForMatchByDate = null;
+        if (params.filter && params.filter.fromDate && params.filter.toDate) {
+            $andForMatchByDate = matchByDate(params.filter.fromDate, params.filter.toDate);
+        }
+
+        pipeline.push(...[
+            {
+                $addFields: {
+                    fullDate: {
+                        $dateFromString: {
+                            dateString: "$fullDate",
+                            format: "%Y-%m-%d:%H-%M",
+                        }
+                    }
+                }
+            },
+            {
+                $match: {
+                    $and: $andForMatchByDate || [
+                        {
+                            $expr: {
+                                $eq: ["$_id", "$_id"],
+                            }
+                        }
+                    ],
+                }
+            },
+            {
+                $group: {
+                    _id: "$doctor",
+                    count: {
+                        $sum: 1,
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    let: {
+                        doctor: "$_id",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$doctor"]
+                                }
+                            }
+                        }
+                    ],
+                    as: "doctor"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$doctor"
+                }
+            },
+            {
+                $addFields: {
+                    doctor: "$doctor.fullName"
+                }
+            },
+            {
+                $sort: {
+                    count: -1,
+                }
+            }
+        ]);
+
+        return Collections.events.aggregate(pipeline).toArray();
     }
 };
