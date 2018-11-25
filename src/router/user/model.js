@@ -683,6 +683,20 @@ module.exports = {
         return this.getById(doctor._id);
     },
 
+    async updateOne(_id, updateFields) {
+        return Collections.users.findOneAndUpdate(
+            {
+                _id: ObjectId(_id)
+            },
+            {
+                $set: updateFields
+            },
+            {
+                new : true,
+            }
+        )
+    },
+
     has(match) {
         return Collections.users.find(match).hasNext();
     }

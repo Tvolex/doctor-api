@@ -74,4 +74,12 @@ module.exports = {
         patronymic,
         personalKey,
     }),
+
+    update: Joi.object().keys({
+        email,
+        name,
+        surname,
+        patronymic,
+        avatar,
+    }),
 };

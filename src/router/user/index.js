@@ -1,9 +1,12 @@
 const express = require('express');
 const Router = express.Router();
 const _ = require('lodash');
+const Joi = require('joi');
+const ObjectId = require('mongodb').ObjectId;
 const CheckAuth = require('../auth/checkAuth');
 const UserModel = require('./model');
 const EventModel = require('../event/model');
+const Schema = require('./Joi.schema');
 const { EVENT_STATUS } = require('../../const');
 
 const getRandom = () => {
@@ -122,6 +125,57 @@ Router.get('/:_id', CheckAuth, async (req, res, next) => {
     }
 
 
+});
+
+Router.put('/:_id', CheckAuth, async (req, res, next) => {
+    const { params: { _id }, body } = req;
+
+    const existUser = await UserModel.getById(_id);
+
+    if (!existUser) {
+        return res.status(400).send('Такого користувача не існує!');
+    }
+
+    const fieldsToUpdate = {};
+    if (body.name) {
+        fieldsToUpdate.name = body.name;
+    }
+    if (body.surname) {
+        fieldsToUpdate.surname = body.surname;
+    }
+    if (body.patronymic) {
+        fieldsToUpdate.patronymic = body.patronymic;
+    }
+    if (body.password) {
+        fieldsToUpdate.password = body.password;
+    }
+    if (body.avatar) {
+        fieldsToUpdate.avatar = body.avatar;
+    }
+
+    let updateObj;
+    try {
+        updateObj = await Joi.validate(fieldsToUpdate, Schema.update);
+    } catch (err) {
+        err.status = 400;
+        console.log(err);
+        throw err;
+    }
+
+    if (body.avatar) {
+        updateObj.avatar = ObjectId(body.avatar);
+    }
+
+    let updated;
+    try {
+        updated = await UserModel.updateOne(_id, updateObj);
+    } catch (err) {
+        err.status = 500;
+        console.log(err);
+        throw err;
+    }
+
+    res.status(200).send(updated.value);
 });
 
 Router.get('/', async (req, res, next) => {
