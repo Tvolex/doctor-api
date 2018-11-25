@@ -152,30 +152,72 @@ Router.put('/:_id', CheckAuth, async (req, res, next) => {
     if (body.avatar) {
         fieldsToUpdate.avatar = body.avatar;
     }
+    if (body.city) {
+        fieldsToUpdate.city = body.city;
+    }
+    if (body.street) {
+        fieldsToUpdate.street = body.street;
+    }
+    if (body.house) {
+        fieldsToUpdate.house = body.house;
+    }
+    if (body.apartment) {
+        fieldsToUpdate.apartment = body.apartment;
+    }
+    if (body.passportSeries) {
+        fieldsToUpdate.passportSeries = body.passportSeries;
+    }
+    if (body.passportNumber) {
+        fieldsToUpdate.passportNumber = body.passportNumber;
+    }
+    if (body.cabinet) {
+        fieldsToUpdate.cabinet = body.cabinet;
+    }
+    if (body.specialization) {
+        fieldsToUpdate.specialization = body.specialization;
+    }
 
     let updateObj;
     try {
         updateObj = await Joi.validate(fieldsToUpdate, Schema.update);
     } catch (err) {
-        err.status = 400;
         console.log(err);
-        throw err;
+        return res.status(400).send(err);
     }
 
-    if (body.avatar) {
+    if (updateObj.avatar) {
         updateObj.avatar = ObjectId(body.avatar);
     }
+    if (updateObj.specialization) {
+        updateObj.specialization = body.specialization.map(ObjectId);
+    }
 
-    let updated;
+    if (updateObj.name && updateObj.surname && updateObj.patronymic) {
+        updateObj.fullName = `${updateObj.surname} ${updateObj.name} ${updateObj.patronymic}`;
+    }
+
     try {
-        updated = await UserModel.updateOne(_id, updateObj);
+        await UserModel.updateOne(_id, updateObj);
     } catch (err) {
         err.status = 500;
         console.log(err);
         throw err;
     }
 
-    res.status(200).send(updated.value);
+    let user;
+    try {
+        user = await UserModel.getById(_id);
+    } catch (err) {
+        err.status = 500;
+        console.log(err);
+        throw err;
+    }
+
+    res.status(200).send({
+        type: 'info',
+        message: 'updated',
+        value: user,
+    });
 });
 
 Router.get('/', async (req, res, next) => {

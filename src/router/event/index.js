@@ -13,7 +13,7 @@ Router.post('/', async (req, res, next) => {
             if (dataOfInserting.insertedId && dataOfInserting.result.ok) {
                 return res
                     .status(200)
-                    .send({ type: 'info', message: `Ви були успішно зареєстровані по вашому персональному ключу`});
+                    .send({ type: 'info', message: `Запис по персональному ключу успішний!`});
             }
 
         } else if (body.newPatient) {
