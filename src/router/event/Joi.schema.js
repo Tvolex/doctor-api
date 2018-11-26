@@ -29,6 +29,7 @@ module.exports = {
     updateEventStatus: {
         _id: Joi.string().regex(OBJECT_ID_REGEX).required(),
         status: status.required(),
+        comment: Joi.string(),
     },
     personalKey: Joi.string().required(),
     newPatient: Joi.object().keys({

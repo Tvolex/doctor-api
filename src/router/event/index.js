@@ -27,7 +27,7 @@ Router.post('/', async (req, res, next) => {
         } else {
             return res.status(400).send({
                 type: 'warning',
-                message: 'Need a personal key or user data'
+                message: 'Необхідний персональний ключ!'
             })
         }
     } catch (err) {
@@ -38,17 +38,17 @@ Router.post('/', async (req, res, next) => {
 
     return res
         .status(500)
-        .send({ type: 'error', message: 'Something went wrong'});
+        .send({ type: 'error', message: 'Щось пійшло не так!'});
 
 });
 
 Router.put('/status/:_id', async (req, res, next) => {
-    const { body: { status } } = req;
+    const { body: { status, comment } } = req;
     const { _id } = req.params;
 
     let eventAfterUpdate;
     try {
-        eventAfterUpdate = await EventModel.updateStatus({ _id, status});
+        eventAfterUpdate = await EventModel.updateStatus(_id, {status, comment});
     } catch (err) {
         console.log(err);
 
@@ -58,12 +58,12 @@ Router.put('/status/:_id', async (req, res, next) => {
     if (eventAfterUpdate.ok) {
         return res
             .status(200)
-            .send({ type: 'info', message: `Статус успішно встановлений на ${status}`});
+            .send({ type: 'info', message: `Статус успішно змінений!`});
     }
 
     return res
         .status(500)
-        .send({ type: 'error', message: 'Something went wrong'});
+        .send({ type: 'error', message: 'Щось пішло не так!'});
 
 });
 

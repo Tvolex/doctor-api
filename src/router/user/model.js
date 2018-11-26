@@ -29,6 +29,7 @@ const defaultUserProject = {
     cabinet: 1,
     surname: 1,
     history: 1,
+    comment: 1,
     fullName: 1,
     birthdate: 1,
     apartment: 1,
@@ -558,7 +559,10 @@ module.exports = {
                     pipeline: [
                         {
                             $match: {
-                                status: EVENT_STATUS.PASSED
+                                status: EVENT_STATUS.PASSED,
+                                $expr: {
+                                    $eq: ['$patient', '$$user'],
+                                }
                             }
                         },
                         {
@@ -593,29 +597,29 @@ module.exports = {
                             $lookup: {
                                 from: 'users',
                                 let: {
-                                    patient: "$patient",
+                                    doctor: "$doctor",
                                 },
                                 pipeline: [
                                     {
                                         $match: {
                                             $expr: {
-                                                $eq: ["$_id", "$$patient"]
+                                                $eq: ["$_id", "$$doctor"]
                                             }
                                         }
                                     }
                                 ],
-                                as: "patient"
+                                as: "doctor"
                             }
                         },
                         {
                             $unwind: {
-                                path: "$patient",
+                                path: "$doctor",
                             }
                         },
                         {
                             $addFields: {
-                                patient: "$patient._id",
-                                patientFullName: "$patient.fullName",
+                                doctor: "$doctor._id",
+                                doctorFullName: "$doctor.fullName",
                             }
                         }
                     ],

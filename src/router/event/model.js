@@ -146,10 +146,10 @@ module.exports = {
         return UserModel.getById(user._id);
     },
 
-    async updateStatus({ _id, status}) {
+    async updateStatus(_id, { status, comment }) {
         let event;
         try {
-            event = await Joi.validate({_id, status}, Schema.updateEventStatus);
+            event = await Joi.validate({_id, status, comment}, Schema.updateEventStatus);
         } catch (err) {
             throw err;
         }
@@ -159,6 +159,7 @@ module.exports = {
         },{
             $set: {
                 status: event.status,
+                comment: event.comment,
             }
         }, {
             new: true,
