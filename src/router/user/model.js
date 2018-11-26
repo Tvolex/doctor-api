@@ -3,6 +3,7 @@ const _ = require('lodash');
 const ObjectId = require('mongodb').ObjectId;
 const moment = require('moment');
 const keygen = require("keygenerator");
+const { EVENT_STATUS } = require('../../const');
 const { getCollections } = require('../../db');
 const Notificator = require('../notification');
 const Schema = require('./Joi.schema');
@@ -24,9 +25,10 @@ const defaultUserProject = {
     house: 1,
     street: 1,
     avatar: 1,
-    cabinet: 1,
     events: 1,
+    cabinet: 1,
     surname: 1,
+    history: 1,
     fullName: 1,
     birthdate: 1,
     apartment: 1,
@@ -545,6 +547,79 @@ module.exports = {
                         }
                     ],
                     as: 'events',
+                },
+            },
+            {
+                $lookup: {
+                    from: 'events',
+                    let: {
+                        user: '$_id',
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                status: EVENT_STATUS.PASSED
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'specializations',
+                                let: {
+                                    specialization: "$specialization",
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ["$_id", "$$specialization"]
+                                            }
+                                        }
+                                    }
+                                ],
+                                as: "specialization"
+                            }
+                        },
+                        {
+                            $unwind: {
+                                path: "$specialization",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                specialization: "$specialization.name",
+                            }
+                        },
+                        {
+                            $lookup: {
+                                from: 'users',
+                                let: {
+                                    patient: "$patient",
+                                },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $eq: ["$_id", "$$patient"]
+                                            }
+                                        }
+                                    }
+                                ],
+                                as: "patient"
+                            }
+                        },
+                        {
+                            $unwind: {
+                                path: "$patient",
+                            }
+                        },
+                        {
+                            $addFields: {
+                                patient: "$patient._id",
+                                patientFullName: "$patient.fullName",
+                            }
+                        }
+                    ],
+                    as: 'history',
                 }
             },
             ...avatarLookup,
