@@ -30,6 +30,7 @@ const defaultUserProject = {
     surname: 1,
     history: 1,
     comment: 1,
+    contact: 1,
     fullName: 1,
     birthdate: 1,
     apartment: 1,
@@ -209,6 +210,57 @@ module.exports = {
             ]);
         }
 
+        if (!_.isEmpty(params.search)) {
+            pipeline.push({
+                $match: {
+                    $or: [
+                        {
+                            email: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            fullName: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            city: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            contact: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            street: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            birthdate: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            passportNumber: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                    ],
+                }
+            });
+        }
+
         pipeline.push(...avatarLookup);
 
         pipeline.push({
@@ -257,6 +309,12 @@ module.exports = {
                         },
                         {
                             city: {
+                                $regex: `.*${params.search}.*`,
+                                $options: 'i',
+                            }
+                        },
+                        {
+                            contact: {
                                 $regex: `.*${params.search}.*`,
                                 $options: 'i',
                             }
@@ -725,6 +783,7 @@ module.exports = {
         console.log('Created new user with id: ' + patient._id);
 
         // Notificator.sendSMS('+380508554730', `Ваш персональний ключ: ${patient.personalKey}`);
+        // TODO: SMS
         Notificator.sendEmail(patient.email, `Ваш персональний ключ: </b>${patient.personalKey}</b> . При наступному записі просто використовуйте цей ключ.`);
 
         return this.getById(patient._id);
@@ -757,6 +816,8 @@ module.exports = {
             console.log(err);
             throw err;
         }
+
+        Notificator.sendEmail(doctor.email, `Ваш пароль: </b>${doctor.password}</b> .`);
 
         console.log('Created new user with id: ' + doctor._id);
 

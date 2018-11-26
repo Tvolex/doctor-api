@@ -23,6 +23,7 @@ const cabinet = Joi.number();
 const passportNumber = Joi.number();
 const type = Joi.string().valid(['doctor', 'patient']);
 const personalKey = Joi.string().min(32).max(32);
+const contact = Joi.string();
 
 const specialization = Joi.array().items(Joi.string().regex(OBJECT_ID_REGEX));
 
@@ -35,12 +36,21 @@ module.exports = {
         patronymic: patronymic.required(),
         avatar: avatar.allow([null, '']),
         cabinet: cabinet.required(),
+        birthdate: birthdate.required(),
+        contact: contact.required(),
+        city: city.required(),
+        street: street.required(),
+        house: house.required(),
+        apartment: apartment.required(),
+        passportSeries: passportSeries.required(),
+        passportNumber: passportNumber.required(),
     }),
     createNewPatient: Joi.object().keys({
         email: email.required(),
         name: name.required(),
         surname: surname.required(),
         patronymic: patronymic.required(),
+        contact: contact.required(),
         birthdate: birthdate.required(),
         avatar: avatar.allow([null, '']),
         city: city.required(),

@@ -39,7 +39,7 @@ app.use('/api', router);
 
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 
-cron.schedule('1 * * * *', function () {
+cron.schedule('37 * * * *', function () {
     EventModel.getEventsByStatus(EVENT_STATUS.PLANNED).then(events => {
         const currentDate = moment();
 
@@ -58,10 +58,12 @@ cron.schedule('1 * * * *', function () {
             if (_.isEqual(event.year, year) &&
                 _.isEqual(event.month, month) &&
                 _.isEqual(event.date, date) &&
-                _.isEqual(eventFullDate.get('hour') -1, hour)
+                _.isEqual(eventFullDate.get('hour') , hour)
             ) {
                 console.log("Sent remind");
-                Notificator.sendEmail(event.patient.email, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`)
+                Notificator.sendEmail(event.patient.email, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
+               // Notificator.sendSMS(event.patient.contact, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
+                // TODO: sms
             }
         })
     }).catch(err => console.log(err));

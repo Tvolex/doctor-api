@@ -15,6 +15,8 @@ const apartment = Joi.number();
 const passportSeries = Joi.string().max(4).required();
 const passportNumber = Joi.number().required();
 const personalKey = Joi.string().required();
+const contact = Joi.string();
+const avatar = Joi.string();
 
 const status = Joi.string().valid(Object.values(EVENT_STATUS));
 
@@ -33,16 +35,19 @@ module.exports = {
     },
     personalKey: Joi.string().required(),
     newPatient: Joi.object().keys({
-        email,
-        name,
-        surname,
-        patronymic,
-        birthdate,
-        city,
-        street,
-        house,
-        apartment,
-        passportSeries,
-        passportNumber,
+        email: email.required(),
+        name: name.required(),
+        surname: surname.required(),
+        patronymic: patronymic.required(),
+        contact: contact.required(),
+        birthdate: birthdate.required(),
+        avatar: avatar.allow([null, '']),
+        city: city.required(),
+        street: street.required(),
+        house: house.required(),
+        apartment: apartment.required(),
+        passportSeries: passportSeries.required(),
+        passportNumber: passportNumber.required(),
+        avatar: avatar.allow([null, '']),
     }),
 };

@@ -22,13 +22,13 @@ module.exports = {
     sendEmail: (to, message) => {
         const msg = {
             to,
-            from: 'noreply@gmail.com',
-            subject: 'Doctor CMS.',
-            text: 'test text',
+            from: 'no-reply@doctor.dns-cloud.net',
+            subject: 'Doctor CMS',
+            text: 'test',
             html: message,
         };
         SendGrid.send(msg).then((sent) => {
-            console.log(sent)
+            console.log(`Send sms to: ${to}`)
         }).catch((err) => {
             console.log(err);
         });

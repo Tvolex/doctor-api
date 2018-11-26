@@ -5,7 +5,7 @@ const multipartMiddleware = multipart();
 const CheckAuth = require('../auth/checkAuth');
 const ImagesModel = require('./model');
 
-Router.post('/', CheckAuth, multipartMiddleware, async (req, res, next) => {
+Router.post('/', multipartMiddleware, async (req, res, next) => {
 
     if (!req.files && !req.files.image) {
         return res.status(400).send("Фото не завантажено!");
