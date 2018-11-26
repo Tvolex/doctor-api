@@ -80,6 +80,7 @@ module.exports = {
         name,
         surname,
         patronymic,
+        birthdate,
         avatar,
         password,
         city,

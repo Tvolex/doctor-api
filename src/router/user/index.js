@@ -3,6 +3,7 @@ const Router = express.Router();
 const _ = require('lodash');
 const Joi = require('joi');
 const ObjectId = require('mongodb').ObjectId;
+const moment = require('moment');
 const CheckAuth = require('../auth/checkAuth');
 const UserModel = require('./model');
 const EventModel = require('../event/model');
@@ -149,6 +150,9 @@ Router.put('/:_id', CheckAuth, async (req, res, next) => {
     if (body.password) {
         fieldsToUpdate.password = body.password;
     }
+    if (body.birthdate) {
+        fieldsToUpdate.birthdate = body.birthdate;
+    }
     if (body.avatar) {
         fieldsToUpdate.avatar = body.avatar;
     }
@@ -188,8 +192,13 @@ Router.put('/:_id', CheckAuth, async (req, res, next) => {
     if (updateObj.avatar) {
         updateObj.avatar = ObjectId(body.avatar);
     }
-    if (updateObj.specialization) {
-        updateObj.specialization = body.specialization.map(ObjectId);
+
+    if (updateObj.birthdate) {
+        updateObj.birthdate = moment(updateObj.birthdate).format("YYYY-MM-DD");
+    }
+
+    if (!_.isEmpty(updateObj.specialization)) {
+        updateObj.specialization = body.specialization.map(spec => ObjectId(spec));
     }
 
     if (updateObj.name && updateObj.surname && updateObj.patronymic) {

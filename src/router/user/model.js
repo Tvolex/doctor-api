@@ -124,7 +124,7 @@ const filterBuilder = (filters) => {
                 $and.push({type: { $in: filters.type} });
                 break;
             case "specialization":
-                $and.push({specialization: { $in: filters.specialization} });
+                $and.push({specialization: { $in: filters.specialization.map(spec => ObjectId(spec))} });
                 break;
         }
     }
@@ -664,6 +664,7 @@ module.exports = {
         doctor._id = new ObjectId();
         doctor.avatar = doctor.avatar ? ObjectId(doctor.avatar) : null;
         doctor.fullName = `${doctor.surname} ${doctor.name} ${doctor.patronymic}`;
+        doctor.specialization = doctor.specialization.map(spec => ObjectId(spec));
         doctor.type = 'doctor';
         doctor.password = '123';
         doctor.createdBy = {
