@@ -9,6 +9,7 @@ const config = {
     AWS_S3_BUCKET_NAME: process.env.AWS_S3_BUCKET_NAME,
     AWS_S3_BUCKET_REGION: process.env.AWS_S3_BUCKET_REGION,
     AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    TZ: process.env.TZ || 0,
 };
 
 module.exports = config;

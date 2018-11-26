@@ -41,12 +41,16 @@ app.get('/ping', (req, res) => res.status(200).send('pong'));
 
 cron.schedule('1 * * * *', function () {
     EventModel.getEventsByStatus(EVENT_STATUS.PLANNED).then(events => {
-        const currentDate = new Date();
+        const currentDate = moment();
 
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth();
-        const date = currentDate.getDate();
-        const hour = currentDate.getHours();
+        currentDate.utcOffset(config.TZ);
+
+        console.log(`current date: ${currentDate.format()}`);
+
+        const year = currentDate.get('year');
+        const month = currentDate.get('month');
+        const date = currentDate.get('date');
+        const hour = currentDate.get('hour');
 
         events.filter(event => {
             const eventFullDate = moment(event.fullDate, "YYYY-MM-DD:HH-mm");
