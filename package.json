@@ -25,10 +25,12 @@
     "mongodb": "^3.1.8",
     "mongoose": "^5.3.9",
     "node-cron": "^2.0.3",
-    "nodemon": "^1.18.5",
     "path": "^0.12.7",
     "rand-token": "^0.4.0",
     "twilio": "^3.24.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
   },
   "engines": {
     "node": "10.11.0",
