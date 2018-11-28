@@ -1,7 +1,11 @@
 const express = require('express');
 const Router = express.Router();
+const _ = require('lodash');
 const CheckAuth = require('../auth/checkAuth');
+const UserModel = require('../user/model');
 const EventModel = require('./model');
+const Notificator = require('../notification');
+const { EVENT_STATUS } = require('../../const');
 
 Router.post('/', async (req, res, next) => {
     const { body } = req;
@@ -55,16 +59,34 @@ Router.put('/status/:_id', async (req, res, next) => {
         return res.status(err.status || 500).send({type: 'error', message: err.message});
     }
 
-    if (eventAfterUpdate.ok) {
+    let user;
+    try {
+        user = await UserModel.getById(eventAfterUpdate.value.patient);
+    } catch (err) {
+        console.log(err);
+        return res.status(err.status || 500).send({type: 'error', message: err.message});
+    }
+
+    if (!eventAfterUpdate.ok) {
         return res
-            .status(200)
-            .send({ type: 'info', message: `Статус успішно змінений!`});
+            .status(2)
+            .send({ type: 'error', message: `Статус не змінений!`});
+    }
+
+    if (_.isEqual(status, EVENT_STATUS.REJECTED)) {
+        if (user.email && eventAfterUpdate.value.comment) {
+            Notificator.sendEmail(user.email,
+                `На жаль, ваш запис на дату: ${eventAfterUpdate.value.fullDate.replace(':', ' та час: ')} відхилений з наступним коментарієм: "${eventAfterUpdate.value.comment}"`);
+        }
+
+        if (user.contact && eventAfterUpdate.value.comment) {
+            Notificator.sendSMS(user.contact, `На жаль, ваш запис на дату: ${eventAfterUpdate.value.fullDate.replace(':', ' та час: ')} відхилений з наступним коментарієм: "${eventAfterUpdate.value.comment}"`);
+        }
     }
 
     return res
-        .status(500)
-        .send({ type: 'error', message: 'Щось пішло не так!'});
-
+        .status(200)
+        .send({ type: 'info', message: `Статус успішно змінений!`});
 });
 
 Router.put('/:_id', async (req, res, next) => {

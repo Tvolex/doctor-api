@@ -14,7 +14,7 @@ module.exports = {
                 body: message,
             },
         ).then((message) => {
-            console.log(message)
+            console.log(`Send sms to: ${to}`)
         }).catch((err) => {
             console.log(err);
         });
@@ -28,7 +28,7 @@ module.exports = {
             html: message,
         };
         SendGrid.send(msg).then((sent) => {
-            console.log(`Send sms to: ${to}`)
+            console.log(`Send email to: ${to}`)
         }).catch((err) => {
             console.log(err);
         });

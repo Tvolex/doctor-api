@@ -48,6 +48,9 @@ const matchByDate = (fromDate, toDate) => {
 };
 
 module.exports = {
+    async getById(id) {
+        return Collections.events.findOne({_id: ObjectId(id)});
+    },
 
     async getEventsByUserId(id) {
         const pipeline = [];
