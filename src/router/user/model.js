@@ -617,7 +617,7 @@ module.exports = {
                     pipeline: [
                         {
                             $match: {
-                                status: EVENT_STATUS.PASSED,
+                                status: {$in: [EVENT_STATUS.PASSED, EVENT_STATUS.REJECTED]},
                                 $expr: {
                                     $eq: ['$patient', '$$user'],
                                 }

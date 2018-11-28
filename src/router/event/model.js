@@ -151,6 +151,7 @@ module.exports = {
         try {
             event = await Joi.validate({_id, status, comment}, Schema.updateEventStatus);
         } catch (err) {
+            err.status = 400;
             throw err;
         }
 

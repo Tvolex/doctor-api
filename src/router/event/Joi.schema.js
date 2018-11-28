@@ -17,6 +17,7 @@ const passportNumber = Joi.number().required();
 const personalKey = Joi.string().required();
 const contact = Joi.string();
 const avatar = Joi.string();
+const comment = Joi.string();
 
 const status = Joi.string().valid(Object.values(EVENT_STATUS));
 
@@ -31,7 +32,7 @@ module.exports = {
     updateEventStatus: {
         _id: Joi.string().regex(OBJECT_ID_REGEX).required(),
         status: status.required(),
-        comment: Joi.string(),
+        comment: comment.required(),
     },
     personalKey: Joi.string().required(),
     newPatient: Joi.object().keys({
