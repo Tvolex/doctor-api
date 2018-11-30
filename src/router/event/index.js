@@ -1,6 +1,8 @@
 const express = require('express');
 const Router = express.Router();
 const _ = require('lodash');
+const moment = require('moment');
+const config = require('../../../config');
 const CheckAuth = require('../auth/checkAuth');
 const UserModel = require('../user/model');
 const EventModel = require('./model');
@@ -46,7 +48,7 @@ Router.post('/', async (req, res, next) => {
 
 });
 
-Router.put('/status/:_id', async (req, res, next) => {
+Router.put('/status/:_id', CheckAuth, async (req, res, next) => {
     const { body: { status, comment } } = req;
     const { _id } = req.params;
 
@@ -89,31 +91,6 @@ Router.put('/status/:_id', async (req, res, next) => {
         .send({ type: 'info', message: `Статус успішно змінений!`});
 });
 
-Router.put('/:_id', async (req, res, next) => {
-    const { body: { status } } = req;
-    const { _id } = req.params;
-
-    let eventAfterUpdate;
-    try {
-
-    } catch (err) {
-        console.log(err);
-
-        return res.status(err.status || 500).send({type: 'error', message: err.message});
-    }
-
-    // if (eventAfterUpdate.status === status) {
-    //     return res
-    //         .status(200)
-    //         .send({ type: 'info', message: `Статус успішно встановлений на ${status}`});
-    // }
-
-    return res
-        .status(500)
-        .send({ type: 'error', message: 'Something went wrong'});
-
-});
-
 Router.get('/busy', async (req, res, next) => {
     const { doctor, fullDate } = req.query;
 
@@ -131,9 +108,18 @@ Router.get('/busy', async (req, res, next) => {
 });
 
 Router.get('/', async (req, res, next) => {
-    const { doctor, patient } = req.query;
+    let { fromDate, toDate } = req.query;
+    let { uId } = req.session;
 
-    EventModel.getEventsByUserId({doctor, patient}).then((events) => {
+    const currentDate = moment();
+    currentDate.utcOffset(config.TZ);
+
+    if (!fromDate || !toDate) {
+        fromDate = currentDate.startOf('day').format("YYYY-MM-DD:HH-mm");
+        toDate = currentDate.endOf('day').format("YYYY-MM-DD:HH-mm");
+    }
+
+    EventModel.getEventsByStatusAndTime(Object.values(EVENT_STATUS), { fromDate, toDate, doctor: uId }).then((events) => {
         return res.status(200).send(events);
     }).catch((err) => {
         return res.status(err.status || 500).send({type: 'error', message: err.message});

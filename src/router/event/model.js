@@ -228,12 +228,55 @@ module.exports = {
         return Collections.events.insertOne(eventFullData);
     },
 
-    async getEventsByStatus(status = EVENT_STATUS.PLANNED) {
+    async getEventsByStatusAndTime(status = [EVENT_STATUS.PLANNED], {fromDate, toDate, doctor}) {
+        const $match = {
+            status: { $in: status },
+        };
+
+        if (fromDate && toDate) {
+            $match.$expr = {
+                $and: [
+                    {
+                        $gte: [
+                            {
+                                $dateFromString: {
+                                    dateString: "$fullDate",
+                                    format: "%Y-%m-%d:%H-%M",
+                                },
+                            },
+                            {
+                                $dateFromString: {
+                                    dateString: moment(fromDate, 'YYYY-MM-DD:HH-mm').format(),
+                                },
+                            },
+                        ]
+                    },
+                    {
+                        $lte: [
+                            {
+                                $dateFromString: {
+                                    dateString: "$fullDate",
+                                    format: "%Y-%m-%d:%H-%M",
+                                },
+                            },
+                            {
+                                $dateFromString: {
+                                    dateString: moment(toDate, 'YYYY-MM-DD:HH-mm').format(),
+                                },
+                            },
+                        ],
+                    }
+                ]
+            }
+        }
+
+        if (doctor) {
+            $match.doctor = ObjectId(doctor);
+        }
+
         const pipeline = [
             {
-                $match: {
-                    status
-                }
+                $match
             },
             {
                 $lookup: {

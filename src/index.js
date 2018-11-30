@@ -40,10 +40,14 @@ app.use('/api', router);
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 
 cron.schedule('37 * * * *', function () {
-    EventModel.getEventsByStatus(EVENT_STATUS.PLANNED).then(events => {
-        const currentDate = moment();
+    const currentDate = moment();
+    currentDate.utcOffset(config.TZ);
 
-        currentDate.utcOffset(config.TZ);
+    EventModel.getEventsByStatusAndTime([EVENT_STATUS.PLANNED], {
+        fromDate: currentDate.startOf('day').format("YYYY-MM-DD:HH-mm"),
+        toDate: currentDate.endOf('day').format("YYYY-MM-DD:HH-mm"),
+        doctor: null,
+    }).then(events => {
 
         console.log(`current date: ${currentDate.format()}`);
 
