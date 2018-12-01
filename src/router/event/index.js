@@ -114,7 +114,10 @@ Router.get('/', async (req, res, next) => {
     const currentDate = moment();
     currentDate.utcOffset(config.TZ);
 
-    if (!fromDate || !toDate) {
+    if (fromDate && toDate) {
+        fromDate = moment(fromDate, "YYYY-MM-DD:HH-mm").utcOffset(config.TZ).startOf('day').format("YYYY-MM-DD:HH-mm");
+        toDate = moment(toDate, "YYYY-MM-DD:HH-mm").utcOffset(config.TZ).endOf('day').format("YYYY-MM-DD:HH-mm");
+    } else {
         fromDate = currentDate.startOf('day').format("YYYY-MM-DD:HH-mm");
         toDate = currentDate.endOf('day').format("YYYY-MM-DD:HH-mm");
     }

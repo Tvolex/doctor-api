@@ -9,6 +9,74 @@ const { EVENT_STATUS } = require('../../const');
 const Collections = getCollections();
 const UserModel = require('../user/model');
 
+const avatarLookup = [
+    {
+        $lookup: {
+            from: 'images',
+            let: {
+                avatarId: '$avatar',
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$_id", "$$avatarId"]
+                        }
+                    }
+                },
+            ],
+            as: 'avatar',
+        }
+    },
+    {
+        $addFields: {
+            "avatar": {
+                $cond: [
+                    { $eq: ["$avatar", []] },
+                    null,
+                    { $arrayElemAt: ["$avatar", 0] },
+                ]
+            }
+        }
+    },
+    {
+        $addFields: {
+            "avatar": {
+                $cond: [
+                    { $eq: ["$avatar", []] },
+                    null,
+                    "$avatar.Location",
+                ]
+            }
+        }
+    }
+];
+
+const defaultUserProject = {
+    city: 1,
+    name: 1,
+    type: 1,
+    email: 1,
+    admin: 1,
+    house: 1,
+    street: 1,
+    avatar: 1,
+    events: 1,
+    cabinet: 1,
+    surname: 1,
+    history: 1,
+    comment: 1,
+    contact: 1,
+    fullName: 1,
+    birthdate: 1,
+    apartment: 1,
+    patronymic: 1,
+    personalKey: 1,
+    passportSeries: 1,
+    passportNumber: 1,
+    specialization: 1,
+};
+
 function customErr(description, status) {
     const error = new Error(description);
     error.status = status || 500;
@@ -293,7 +361,11 @@ module.exports = {
                                     ]
                                 }
                             }
-                        }
+                        },
+                        {
+                            $project: defaultUserProject,
+                        },
+                        ...avatarLookup,
                     ],
                     as: "patient"
                 }
@@ -324,6 +396,34 @@ module.exports = {
             {
                 $unwind: {
                     path: "$doctor"
+                }
+            },
+            {
+                $lookup: {
+                    from: 'specializations',
+                    let: {
+                        specialization: "$specialization",
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", "$$specialization"]
+                                }
+                            }
+                        }
+                    ],
+                    as: "specialization"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$specialization",
+                }
+            },
+            {
+                $addFields: {
+                    specialization: "$specialization.name",
                 }
             },
         ];
