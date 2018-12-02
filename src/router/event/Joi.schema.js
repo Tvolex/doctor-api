@@ -20,6 +20,8 @@ const passportNumber = Joi.number();
 const type = Joi.string().valid(['doctor', 'patient']);
 const personalKey = Joi.string().min(32).max(32);
 
+const contact = Joi.string();
+const comment = Joi.string();
 const status = Joi.string().valid(Object.values(EVENT_STATUS));
 
 module.exports = {
