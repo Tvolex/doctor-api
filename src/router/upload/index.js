@@ -8,7 +8,11 @@ const ImagesModel = require('./model');
 Router.post('/', multipartMiddleware, async (req, res, next) => {
 
     if (!req.files && !req.files.image) {
-        return res.status(400).send("Фото не завантажено!");
+        return res.status(400).send({type: "error", message: "Фото не завантажено!"});
+    }
+
+    if (!["image/jpeg", "image/pipeg", "image/svg+xml", "image/tiff", "image/bmp", "image/x-icon", "image/png", "image/pjpeg", "image/webp", "image/gif"].includes(req.files.image.type)) {
+        return res.status(400).send({type: "error", message: `Тип файлу: ${req.files.image.type} не підтримується!`});
     }
 
     let insertedImage;
