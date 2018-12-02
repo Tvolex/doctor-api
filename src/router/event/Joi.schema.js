@@ -49,7 +49,7 @@ module.exports = {
         city: city.required(),
         street: street.required(),
         house: house.required(),
-        apartment: apartment.required(),
+        apartment: apartment,
         passportSeries: passportSeries.required(),
         passportNumber: passportNumber.required(),
         avatar: avatar.allow([null, '']),
