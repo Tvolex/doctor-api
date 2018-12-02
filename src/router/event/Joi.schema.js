@@ -3,7 +3,6 @@ const { OBJECT_ID_REGEX, EVENT_STATUS } = require('../../const');
 
 const currentDate = new Date();
 
-const _id = Joi.ObjectId();
 const email = Joi.string().email({ minDomainAtoms: 2 });
 const password = Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/);
 const name = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u).min(3).max(30);
