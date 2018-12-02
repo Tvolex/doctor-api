@@ -229,6 +229,31 @@ Router.put('/:_id', CheckAuth, async (req, res, next) => {
     });
 });
 
+Router.delete('/:_id', CheckAuth, async (req, res, next) => {
+    const { params: { _id }, body } = req;
+
+    const existUser = await UserModel.getById(_id);
+
+    if (!existUser) {
+        return res.status(400).send('Такого користувача не існує!');
+    }
+
+    let deleted;
+    try {
+        deleted = await UserModel.removePatient(_id);
+    } catch (err) {
+        err.status = 500;
+        console.log(err);
+        throw err;
+    }
+
+    if (deleted.result.ok) {
+        return res.status(200).send({type: 'info', message: "Видалено!"});
+    }
+
+    res.status(500).send({type: 'warning', message: "Не видалено!"});
+});
+
 Router.get('/', async (req, res, next) => {
     UserModel.get(req).then((users) => {
         res.send(users);

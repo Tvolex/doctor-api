@@ -840,5 +840,27 @@ module.exports = {
 
     has(match) {
         return Collections.users.find(match).hasNext();
+    },
+
+    async removePatient(id) {
+        try {
+            await Collections.events.deleteMany({patient: ObjectId(id)});
+        } catch (err) {
+            err.status = 500;
+            console.log(err);
+            throw err;
+        }
+
+        let deleted;
+        try {
+            deleted = await Collections.users.deleteOne({_id: ObjectId(id)});
+        } catch (err) {
+            err.status = 500;
+            console.log(err);
+            throw err;
+        }
+
+        return deleted;
+
     }
 };
