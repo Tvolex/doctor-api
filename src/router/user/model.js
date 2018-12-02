@@ -782,8 +782,7 @@ module.exports = {
 
         console.log('Created new user with id: ' + patient._id);
 
-        // Notificator.sendSMS('+380508554730', `Ваш персональний ключ: ${patient.personalKey}`);
-        // TODO: SMS
+        Notificator.sendSMS(patient.contact, `Ваш персональний ключ: ${patient.personalKey}`);
         Notificator.sendEmail(patient.email, `Ваш персональний ключ: </b>${patient.personalKey}</b> . При наступному записі просто використовуйте цей ключ.`);
 
         return this.getById(patient._id);
@@ -804,7 +803,7 @@ module.exports = {
         doctor.fullName = `${doctor.surname} ${doctor.name} ${doctor.patronymic}`;
         doctor.specialization = doctor.specialization.map(spec => ObjectId(spec));
         doctor.type = 'doctor';
-        doctor.password = '123';
+        doctor.password =  keygen.password();
         doctor.createdBy = {
             date: new Date().toISOString(),
         };
@@ -817,6 +816,7 @@ module.exports = {
             throw err;
         }
 
+        Notificator.sendSMS(doctor.contact, `Ваш пароль: ${doctor.password}`);
         Notificator.sendEmail(doctor.email, `Ваш пароль: </b>${doctor.password}</b> .`);
 
         console.log('Created new user with id: ' + doctor._id);

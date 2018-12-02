@@ -66,8 +66,7 @@ cron.schedule('37 * * * *', function () {
             ) {
                 console.log("Sent remind");
                 Notificator.sendEmail(event.patient.email, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
-               // Notificator.sendSMS(event.patient.contact, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
-                // TODO: sms
+                Notificator.sendSMS(event.patient.contact, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
             }
         })
     }).catch(err => console.log(err));

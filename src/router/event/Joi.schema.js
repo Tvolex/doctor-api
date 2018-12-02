@@ -3,21 +3,23 @@ const { OBJECT_ID_REGEX, EVENT_STATUS } = require('../../const');
 
 const currentDate = new Date();
 
-const email = Joi.string().email({ minDomainAtoms: 2 }).required();
-const name = Joi.string().alphanum().min(3).max(30).required();
-const surname = Joi.string().alphanum().min(3).max(30).required();
-const patronymic = Joi.string().alphanum().min(3).max(30).required();
-const birthdate = Joi.date().required();
-const city = Joi.string().required();
-const street = Joi.string().required();
-const house = Joi.number().required();
+const _id = Joi.ObjectId();
+const email = Joi.string().email({ minDomainAtoms: 2 });
+const password = Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/);
+const name = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u).min(3).max(30);
+const surname = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u).min(3).max(30);
+const patronymic = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u).min(3).max(30);
+const birthdate = Joi.date();
+const city = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u);
+const street = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u);
+const house = Joi.number();
 const apartment = Joi.number();
-const passportSeries = Joi.string().max(4).required();
-const passportNumber = Joi.number().required();
-const personalKey = Joi.string().required();
-const contact = Joi.string();
+const passportSeries = Joi.string().max(3);
 const avatar = Joi.string();
-const comment = Joi.string();
+const cabinet = Joi.number();
+const passportNumber = Joi.number();
+const type = Joi.string().valid(['doctor', 'patient']);
+const personalKey = Joi.string().min(32).max(32);
 
 const status = Joi.string().valid(Object.values(EVENT_STATUS));
 
