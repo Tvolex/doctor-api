@@ -39,7 +39,7 @@ app.use('/api', router);
 
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 
-cron.schedule('37 * * * *', function () {
+cron.schedule('* 9 * * *', function () {
     const currentDate = moment();
     currentDate.utcOffset(config.TZ);
 
@@ -61,8 +61,7 @@ cron.schedule('37 * * * *', function () {
 
             if (_.isEqual(event.year, year) &&
                 _.isEqual(event.month, month) &&
-                _.isEqual(event.date, date) &&
-                _.isEqual(eventFullDate.get('hour') , hour)
+                _.isEqual(event.date, date)
             ) {
                 console.log("Sent remind");
                 Notificator.sendEmail(event.patient.email, `Нагадування. Ваш сеанс на: ${event.time}. Кабiнет: ${event.doctor.cabinet}. До зустрiчi!`);
