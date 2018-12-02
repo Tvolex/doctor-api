@@ -12,7 +12,7 @@ const birthdate = Joi.date();
 const city = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u);
 const street = Joi.string().regex(/[a-zA-Zа-яёА-ЯЁ]/u);
 const house = Joi.number();
-const apartment = Joi.number();
+const apartment = Joi.number().allow(null);
 const passportSeries = Joi.string().max(3);
 const avatar = Joi.string();
 const cabinet = Joi.number();
@@ -49,7 +49,7 @@ module.exports = {
         city: city.required(),
         street: street.required(),
         house: house.required(),
-        apartment: apartment,
+        apartment,
         passportSeries: passportSeries.required(),
         passportNumber: passportNumber.required(),
         avatar: avatar.allow([null, '']),
