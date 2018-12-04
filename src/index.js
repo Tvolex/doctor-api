@@ -39,7 +39,7 @@ app.use('/api', router);
 
 app.get('/ping', (req, res) => res.status(200).send('pong'));
 
-cron.schedule('* 9 * * *', function () {
+cron.schedule('* 11 * * *', function () {
     const currentDate = moment();
     currentDate.utcOffset(config.TZ);
 
