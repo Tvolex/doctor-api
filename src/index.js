@@ -56,7 +56,7 @@ cron.schedule('* 11 * * *', function () {
         const date = currentDate.get('date');
         const hour = currentDate.get('hour');
 
-        events.filter(event => {
+        events.forEach(event => {
             const eventFullDate = moment(event.fullDate, "YYYY-MM-DD:HH-mm");
 
             if (_.isEqual(event.year, year) &&
