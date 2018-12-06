@@ -43,7 +43,7 @@ cron.schedule('* 11 * * *', function () {
     const currentDate = moment();
     currentDate.utcOffset(config.TZ);
 
-    EventModel.getEventsByStatusAndTime([EVENT_STATUS.PLANNED], {
+    EventModel.getEventsByStatusAndTime(null, {
         fromDate: currentDate.startOf('day').format("YYYY-MM-DD:HH-mm"),
         toDate: currentDate.endOf('day').format("YYYY-MM-DD:HH-mm"),
         doctor: null,
