@@ -87,9 +87,9 @@ app.use((req, res, next) => {
         .send('<h1 align="center">Not Found 404</h1>')
 });
 
-setInterval(function() {
-    http.get("http://api-doctor.herokuapp.com/ping");
-}, 1200000);
+// setInterval(function() {
+//     http.get("http://api-doctor.herokuapp.com/ping");
+// }, 1200000);
 
 (async function () {
     const db = await init();

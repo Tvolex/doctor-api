@@ -2,7 +2,7 @@
   "name": "doctor-api",
   "version": "1.0.0",
   "scripts": {
-    "dev": "nodemon %NODE_DEBUG_OPTION% src/index.js",
+    "dev": "nodemon $NODE_DEBUG_OPTION src/index.js",
     "debug": "node $NODE_DEBUG_OPTION src/index.js",
     "start": "node src/index.js"
   },
